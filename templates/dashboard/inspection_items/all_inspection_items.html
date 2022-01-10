@@ -1,0 +1,101 @@
+{% extends '../../layouts/base.html' %}]
+{% load static %}
+
+{% block body %}
+    
+   <h1 class="uk-margin-top">Manage Inspection Equipment</h1>
+   <hr class="uk-divider-icon"/>
+   {% if inspection_items|length > 0 %}
+    <table class="uk-table uk-table-striped">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Type</th>
+                <th>Last Inspection Date</th>
+                <th>Next Due Date</th>
+                <th>Expiration Date</th>
+                <th>Interval</th>
+                <th>QR Code</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in inspection_items %}
+            <tr>
+                <td class="uk-text-bolder">
+                    <a class="uk-link-text" href="{{item.get_absolute_url}}">{{item.title|capfirst}}</a>
+                </td>
+                
+                {% if item.inspection_type == 'rescue' %}
+                    <td><div class="uk-label centra-label-primary">{{item.inspection_type|upper}}</div></td>
+                {% elif  item.inspection_type == 'first aid'%}
+                    <td><div class="uk-label centra-label-red">{{item.inspection_type|upper}}</div></td>
+                {% elif  item.inspection_type == 'ppe' %}
+                    <td><div class="uk-label centra-label-green">{{item.inspection_type|upper}}</div></td>
+                {% elif  item.inspection_type == 'facility' %}
+                    <td><div class="uk-label centra-label-orange">{{item.inspection_type|upper}}</div></td>
+                {% elif  item.inspection_type == 'equipment' %}
+                    <td><div class="uk-label centra-label-yellow">{{item.inspection_type|upper}}</div></td>
+                {% elif  item.inspection_type == 'vehicle' %}
+                    <td><div class="uk-label centra-label-purple">{{item.inspection_type|upper}}</div></td>
+                {% elif  item.inspection_type == 'other' %}
+                    <td><div class="uk-label centra-label-grey">{{item.inspection_type|upper}}</div></td>
+                {% endif %}
+                <td>{{item.last_inspection_date|default_if_none:"--"}}</td>
+                <td>{{item.next_inspection_date}}</td>
+                <td>{{item.expiration_date|default_if_none:"--"}}</td>
+                <td>{{item.inspection_interval|capfirst}}</td>
+                <td align="center">
+                    <a href="#qr-modal-{{item.uuid}}" uk-toggle uk-tooltip="View QR Code">
+                        <img class="uk-icon-image" src="{% static '/images/qr_icon.png' %}"/>
+                    </a>
+                </td>
+                <td>
+                    <a href="{{item.get_absolute_url}}" uk-icon="icon: desktop" uk-tooltip="View"></a>
+                    <a href="{% url 'inspection_items:update' uuid=item.uuid %}" uk-icon="icon: pencil" uk-tooltip="Edit"></a>
+                    <a href="#delete-confirmation-{{item.uuid}}" uk-toggle uk-icon="icon: ban" uk-tooltip="Delete"></a>
+                </td>
+            </tr>
+
+            <div id="qr-modal-{{item.uuid}}" class="uk-flex-top" uk-modal>
+                <div class="uk-modal-dialog uk-margin-auto-vertical">
+                    <div>
+                        {% if item.qr_code %}
+                        <img src="{{item.qr_code.url|default_if_none:"#"}}" alt="QR Code"/>
+                        {% endif %}
+                        
+                    </div>
+                </div>
+            </div>
+
+            <div id="delete-confirmation-{{item.uuid}}" uk-modal>
+                <div class="uk-modal-dialog">
+                    <form action="{% url 'inspection_items:delete' uuid=item.uuid %}" method="get">
+                        <div class="uk-modal-header">
+                            <h2 class="uk-modal-title">Are you sure?</h2>
+                        </div>
+                        <div class="uk-modal-body">
+                            <p>Are you sure you want to delete equipment: "{{item.title}}"?</p>
+                        </div>
+                        <div class="uk-modal-footer">
+                            <button class="uk-modal-close uk-button uk-button-danger" type="button">Cancel</button>
+                            <button class="uk-button uk-button-primary" type="submit">Confirm Delete</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </tbody>
+    </table>
+   {% else %}
+    <div class="uk-container">
+        <div>
+            <div class="uk-card uk-card-primary uk-card-body">
+                <h3 class="uk-card-title">No Inspection Equipment Yet...</h3>
+                <p>If you haven't created an Inpsection Form yet, we suggest you start there so you can assign the inpsection forms to your equipment to be inspected.<br/> Use the <a href="{% url 'inspection_forms:form_builder' %}">Form Builder</a> to build your first custom form</p>
+                <p>If you have creatd your first form, <a href="{% url 'inspection_items:create' %}">Create Your First Inspection Equipment</a> to get started!</p>
+            </div>
+        </div>
+    </div>
+   {% endif %}
+{% endblock body %}

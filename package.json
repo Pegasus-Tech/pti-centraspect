@@ -1,0 +1,11 @@
+{
+    "name": "Centraspect",
+    "description": "Inspection Tool ",
+    "authors": "Pegasus Tech Innovations",
+    "version": "1.0.0",
+    "dependencies": {
+        "formBuilder": "^3.7.3",
+        "fullcalendar": "^5.10.1",
+        "uikit": "^3.9.4"
+    }
+}

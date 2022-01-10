@@ -1,0 +1,67 @@
+{% extends '../../layouts/base.html' %}
+
+{% block body %}
+    <h1 class="uk-margin-top">{{user.account.name}} Forms</h1>
+    <hr class="uk-divider-icon"/>
+    {% if forms|length > 0 %}
+        <table class="uk-table uk-table-striped">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Form Type</th>
+                    <th>Equipment Count</th>
+                    <th>Date Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for form in forms %}
+                    <tr>
+                        <td>{{form.title}}</td>
+                        <td>{{form.form_type|capfirst}}</td>
+                        <td>{{form.inspectionitem_set.count}}</td>
+                        <td>{{form.date_created.date}}</td>
+                        <td>
+
+                            <a href="{{form.get_absolute_url}}" uk-icon="icon: desktop" uk-tooltip="Preview"></a>
+                            {% comment %} <a href='#' uk-icon="icon: settings" uk-tooltip="Usage Stats"></a> {% endcomment %}
+                            <a href="{% url 'inspection_forms:edit' uuid=form.uuid %}" uk-icon="icon: pencil" uk-tooltip="Edit"></a>
+                            <a href="#delete-confirmation-{{form.uuid}}" uk-toggle uk-icon="icon: ban" uk-tooltip="Delete"></a>
+                        </td>
+                    </tr>
+
+                    <div id="delete-confirmation-{{form.uuid}}" uk-modal>
+                        <div class="uk-modal-dialog">
+                            <form action="{% url 'inspection_forms:delete' uuid=form.uuid %}" method="get">
+                                <div class="uk-modal-header">
+                                    <h2 class="uk-modal-title">Are you sure?</h2>
+                                </div>
+                                <div class="uk-modal-body">
+                                    <p>Are you sure you want to delete form: "{{form.title}}"?</p>
+                                </div>
+                                <div class="uk-modal-footer">
+                                    <button class="uk-modal-close uk-button uk-button-danger" type="button">Cancel</button>
+                                    <button class="uk-button uk-button-primary" type="submit">Confirm Delete</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="uk-container">
+            <div>
+                <div class="uk-card uk-card-primary uk-card-body">
+                    <h3 class="uk-card-title">No Forms Created Yet...</h3>
+                    <p>It looks like you haven't created any forms yet.</p>
+                    <p>To get started, use the <a href="{% url 'inspection_forms:form_builder' %}">Form Builder</a> to build your first custom form</p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    
+
+
+{% endblock body %}

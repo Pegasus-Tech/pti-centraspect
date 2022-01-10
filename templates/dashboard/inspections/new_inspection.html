@@ -1,0 +1,35 @@
+{% extends '../../layouts/base.html' %}
+
+{% block body %}
+    
+    <h2 class="uk-margin-top">Log New Inspection: <a class="uk-link-text" href="{% url 'inspection_items:details' uuid=item.uuid %}">{{item.title}}</a></h2>
+    <hr class="uk-divider-icon"/>
+    <form id="log-new-inspection-form" class="uk-margin-bottom" action="{% url 'inspections:create' uuid=item.uuid %}" method="POST"> {% csrf_token %}
+        <div class="fb-render">
+            <div id="fb-log-form">{{form_json|safe}}</div>
+            
+        </div>
+        <input id="log-form-json" name="log-form-json" value="{{form_json}}" hidden/>
+        <hr/>
+
+        <div class="uk-margin-top">
+            <label>Overall Inspection Disposition</label>
+            <select id="form-disposition" class="uk-select" name="inpsection-status">
+                <option value="pass">Pass</option>
+                <option value="fail">Fail</option>
+            </select>
+            <button id="log-form-submit" type="button" class="uk-button uk-button-primary uk-margin-top">Submit</button>
+        </div>
+                
+    </form>
+{% endblock body %}
+
+{% comment %} {% block added_js %}
+    <script type="module" src="../../../../static/js/logInspectionForm.js"></script>
+    <script type="module">
+        import {logInspection} from "../../../../static/js/logInspectionForm.js"
+
+        let json = {{form_json|safe}}
+        $(document).ready(logInspection(json));
+    </script>
+{% endblock added_js %} {% endcomment %}

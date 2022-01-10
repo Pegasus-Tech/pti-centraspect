@@ -1,0 +1,91 @@
+{% load static %}
+<nav class="uk-navbar-container" uk-navbar>
+    <div class="uk-navbar-left uk-margin-left">
+        <a class="uk-navbar-item uk-logo" href="/">
+            <img class="" src="{% static '/images/centraspect_logo_trans.png' %}" width=150/>
+        </a>
+        <ul class="uk-navbar-nav">
+            <li>
+                <a href="#offcanvas-slide" class="uk-navbar-toggle" uk-toggle>
+                    <span uk-navbar-toggle-icon></span> <span class="uk-margin-small-left"></span>
+                </a>
+            </li>   
+        </ul>
+        
+    </div>
+    <div class="uk-navbar-right uk-margin-right">
+        <ul class="uk-navbar-nav">
+           
+            <li class="uk-active">
+                <a class="uk-link-text" uk-icon="icon: chevron-down">{{user.first_name}}</a>
+                <div uk-dropdown="mode: click; pos: bottom-left">
+                    <ul class="uk-nav uk-dropdown-nav">
+                        <li><a href="{% url 'logout' %}">Logout</a></li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+        
+    </div>
+</nav>
+
+<div id="offcanvas-slide" uk-offcanvas="overlay: false; mode:reveal">
+    
+    <div class="uk-offcanvas-bar">
+        <button class="uk-offcanvas-close" type="button" uk-close></button>
+
+        <ul class="uk-nav uk-nav-default">
+            <li  id="dashboard-nav-link"><a href="{% url 'dashboard' %}"><span class="uk-margin-small-right" uk-icon="icon: home"></span> Dashboard</a></li>
+            <li class="uk-nav-divider"></li>
+
+            <li class="uk-nav-header">Inspections</li>
+            <li id="inspection-schedule-nav-link"><a href="{% url 'inspection_calendar:calendar' %}"><span class="uk-margin-small-right" uk-icon="icon: calendar"></span> Inspection Schedule</a></li>
+            <li id="inspection-list-nav-link"><a href="{% url 'inspection_items:list' %}"><span class="uk-margin-small-right" uk-icon="icon: thumbnails"></span> Manage Equipment</a></li>
+            <li id="inspection-create-nav-link"><a href="{% url 'inspection_items:create' %}"><span class="uk-margin-small-right" uk-icon="icon: plus"></span> Add Equipment</a></li>
+
+            <li class="uk-nav-divider"></li>
+
+            <li class="uk-nav-header">Inspection Forms</li>
+            <li id="forms-list-nav-link"><a href="{% url 'inspection_forms:list' %}"><span class="uk-margin-small-right" uk-icon="icon: thumbnails"></span> Manage Forms</a></li>
+            <li id="forms-create-nav-link"><a href="{% url 'inspection_forms:form_builder' %}"><span class="uk-margin-small-right" uk-icon="icon: plus"></span> Form Builder</a></li>
+
+            <li class="uk-nav-divider"></li>
+            <li class="uk-nav-header">Admin</li>
+            <li id="admin-users-nav-link"><a href="{% url 'users:all' %}"><span class="uk-margin-small-right" uk-icon="icon: users"></span> Users</a></li>
+
+
+        </ul>
+
+    </div>
+</div>
+
+<script>
+    window.onload = function() {
+        let loc = window.location.pathname
+
+        if(loc == '/dashboard/') {
+            document.getElementById('dashboard-nav-link').classList.add('uk-active')
+        } 
+        
+        else if(loc == '/dashboard/inspection-items/') {
+            document.getElementById('inspection-list-nav-link').classList.add('uk-active')
+        } 
+
+        else if(loc == '/dashboard/inspection-items/new') {
+            document.getElementById('inspection-create-nav-link').classList.add('uk-active')
+        } 
+        
+        else if(loc == '/dashboard/form-builder/all') {
+            document.getElementById('forms-list-nav-link').classList.add('uk-active')
+        } 
+
+        else if(loc == '/dashboard/form-builder') {
+            document.getElementById('forms-create-nav-link').classList.add('uk-active')
+        } 
+        
+        else if(loc.includes('users')) {
+            document.getElementById('admin-users-nav-link').classList.add('uk-active')
+        }
+
+    }
+</script>

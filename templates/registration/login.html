@@ -1,0 +1,25 @@
+{% extends '../layouts/base.html' %}
+
+{% block body %}
+
+    {% if error %}
+        {{error}}
+    {% endif %}
+
+    <div class="uk-container uk-container-xsmall uk-margin">
+        <h1>Login</h1>
+        <form method="POST", action="{% url 'login' %}">
+            {% csrf_token %}
+            <fieldset class="uk-fieldset">
+                <div class="uk-margin">
+                    <input class="uk-input" name='username' type="email" placeholder="Email">
+                </div>
+                <div class="uk-margin">
+                    <input class="uk-input" name='password' type="password" placeholder="Password">
+                </div>
+            </fieldset>
+            <button class="uk-button uk-button-primary" type="submit">Login</button>
+        </form>
+    </div>
+    
+{% endblock body %}

@@ -1,0 +1,44 @@
+{% extends '../../layouts/base.html' %}
+
+{% block body %}
+    <ul class="uk-breadcrumb uk-margin-bottom">
+        <li><a href="{% url 'inspection_forms:list' %}">All Forms</a></li>
+        <li><a href="{{inspection_form.get_absolute_url}}">{{inspection_form.title}}</a></li>
+        <li class="uk-disabled"><a>edit</a></li>
+    </ul>
+    <form id="edit-inspection-form-form" action="{% url 'inspection_forms:edit' uuid=inspection_form.uuid%}", method="POST">
+        {% csrf_token %}
+        <h1>Edit Form</h1>
+        <hr class="uk-divider-icon"/>
+
+        <div class="uk-grid-small uk-margin-bottom" uk-grid>
+            <div class="uk-width-1-2@s">
+                <label>Form Title</label>
+                <input id="edit-form-title-input" name="title" class="uk-input" type="text" value="{{inspection_form.title}}"/>
+                <input id="edit-form-json" hidden name="form_json"/>
+            </div>
+            <div class="uk-width-1-2@s">
+                <div class="uk-align-right">
+                    <button id="clear-edit-form" type="button" class="uk-button uk-button-danger">Clear All Fields</button>
+                    <button id="save-edit-form" type="button" class="uk-button uk-button-primary">Update Form</button>
+                    <a class="uk-button-link" href="{{inspection_form.get_absolute_url}}">Cancel</a>
+                </div>
+            </div>
+        </div>
+        
+        <div id="fb-editor-edit"></div> 
+        <input id="" hidden type="text" value="{{form_json}}"></input>
+        <a class="uk-margin-bottom centra-fab" href="#" uk-totop uk-scroll></a>
+    </form>
+   
+{% endblock body %}
+
+{% block added_js %}
+    <script type="module" src="../../../../static/js/editFormBuilder.js"></script>
+    <script type="module">
+        import {editForm} from "../../../../static/js/editFormBuilder.js"
+
+        let json = {{form_json|safe}}
+        $(document).ready(editForm(json));
+    </script>
+{% endblock added_js %}

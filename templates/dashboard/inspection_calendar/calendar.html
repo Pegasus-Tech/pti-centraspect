@@ -1,0 +1,24 @@
+{% extends '../../layouts/base.html' %}
+
+
+{% block body %}
+    <div id='inspection-calendar' class="uk-margin-top"></div>
+{% endblock body %}
+
+{% block added_js %}
+    <script type="module">
+        import {loadFullCalendar} from "../../../../static/js/inspectionCalendar.js"
+        $(document).ready(
+            loadFullCalendar(
+                [
+                    {
+                        id: 'a',
+                        title: 'my event',
+                        start: '2022-01-20'
+                    }
+                ]
+            )
+        );
+    </script>
+
+{% endblock added_js %}

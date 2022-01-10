@@ -1,0 +1,39 @@
+{% extends '../layouts/base.html' %}
+
+{% block body %}
+{% if user.is_authenticated %}
+    Hello {{user.first_name}}, {{user.username}}, {{user.email}}, {{user.account}}
+{% endif %}
+ <div class="uk-container uk-container-xsmall uk-margin-top">
+    <form action="{% url 'signup' %}" method='POST'>
+        {% csrf_token %}
+        <fieldset class="uk-fieldset">
+
+            <legend class="uk-legend">Signup</legend>
+
+            <div class="uk-margin">
+                <input class="uk-input" name='company_name' type="text" placeholder="Company Name">
+            </div>
+            <div class="uk-grid">
+                <div class="uk-width-1-2">
+                    <input class="uk-input" name='first_name' type="text" placeholder="First Name">
+                </div>
+                <div class="uk-width-1-2">
+                    <input class="uk-input" name='last_name' type="text" placeholder="Last Name">
+                </div>
+            </div>
+    
+            <div class="uk-margin">
+                <input class="uk-input" name='email' type="email" placeholder="Email">
+            </div>
+            <div class="uk-margin">
+                <input class="uk-input" name='password' type="password" placeholder="Password">
+            </div>
+        </fieldset>
+
+        <button class="uk-button uk-button-primary" type="submit">Signup</button>
+    </form>
+ </div>
+    
+{% endblock body %}
+

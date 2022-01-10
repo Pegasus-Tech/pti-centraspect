@@ -1,0 +1,100 @@
+{% extends '../../layouts/base.html' %}
+
+{% block body %}
+    <div class="uk-container-small uk-align-center uk-margin-medium-top uk-margin-medium-bottom">
+
+        <div class="uk-card uk-card-default">
+            <form class="uk-form-stacked" action="{% url 'inspection_items:update' uuid=inspection_item.uuid %}" method="post">
+                {% csrf_token %}
+                <div class="uk-card-header">
+                    <h1>Update Inspection Equipment</h1>
+                </div>
+
+                <div class="uk-card-body">
+                    <div uk-grid>
+                        <div class="uk-width-1-2 uk-margin">
+                            <label  class="uk-form-label">Title/Name<span style="color:red">*</span></label>
+                            {{form.title}}
+                        </div>
+                        
+                        <div class="uk-width-1-2">
+                            <label  class="uk-form-label">Equipment Description</label>
+                            {{form.description}}
+                        </div>
+        
+                        <div class="uk-width-1-2 uk-margin">
+                            <label  class="uk-form-label">Serial Number</label>
+                            {{form.serial_number}}
+                        </div>
+        
+                        <div class="uk-width-1-2 uk-margin">
+                            <label  class="uk-form-label">Model Number</label>
+                            {{form.model_number}}
+                        </div>
+        
+                        <div class="uk-width-1-2 uk-margin">
+                            <label  class="uk-form-label">Inspection Interval<span style="color:red">*</span></label>
+                            {{form.inspection_interval}}
+                        </div>
+                       
+                        <div class="uk-width-1-2 uk-margin">
+                            <label  class="uk-form-label">Inspection Category<span style="color:red">*</span></label>
+                            {{form.inspection_type}}
+                        </div>
+        
+                        <div class="uk-width-1-2 uk-margin">
+                            <label  class="uk-form-label">Assigned/Belongs To</label>
+                            {{form.assigned_to}}
+                        </div>
+                        
+                        <div class="uk-width-1-2 uk-margin">
+                            <label  class="uk-form-label">Inspection Form</label>
+                            {{form.form}}
+                        </div>
+            
+                        <div class="uk-width-1-2 uk-margin">
+                            <label  class="uk-form-label">First Inspection Date</label>
+                            {{form.first_inspection_date}}
+                        </div>
+                        
+                        <div class="uk-width-1-2 uk-margin">
+                            <label  class="uk-form-label">Last Inspection Date</label>
+                            {{form.last_inspection_date}}
+                        </div>
+                        
+                        <div class="uk-width-1-2 uk-margin">
+                            <label  class="uk-form-label">Next Inspection Due Date<span style="color:red">*</span></label>
+                            {{form.next_inspection_date}}
+                        </div>
+                        
+                        <div class="uk-width-1-2 uk-margin">
+                            <label  class="uk-form-label">Expiration Date</label>
+                            {{form.expiration_date}}
+                        </div>
+                        
+                       
+                    </div>
+                </div>
+
+                <div class="uk-card-footer">
+                    <div uk-grid>
+                        <div class="uk-width-1-2"></div>
+
+                        <div class="uk-width-1-2">
+                            <div class="uk-align-right">
+                                <a class="uk-button uk-button-danger" href="{% url 'inspection_items:list' %}">Cancel</a>
+                                <button type="submit" class="uk-button uk-button-primary">Update</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </form>
+        </div>
+       
+            
+        </form>
+    </div>
+    
+{% endblock body %}
+

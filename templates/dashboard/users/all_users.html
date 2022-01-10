@@ -1,0 +1,94 @@
+{% extends '../../layouts/base.html' %}
+
+{% block body %}
+    {% if messages %}
+        {% for msg in messages %}
+            {% if msg.level_tag == 'error' %}
+                <div class="uk-alert-danger uk-margin-top" uk-alert>
+                    <a class="uk-alert-close" uk-close></a>
+                    <p>{{msg}}</p>
+                </div>
+            {% elif msg.level_tag == 'success' %}
+                <div class="uk-alert-success uk-margin-top" uk-alert>
+                    <a class="uk-alert-close" uk-close></a>
+                    <p>{{msg}}</p>
+                </div>
+
+            {% elif msg.level_tag == 'warning' %}
+                <div class="uk-alert-warning uk-margin-top" uk-alert>
+                    <a class="uk-alert-close" uk-close></a>
+                    <p>{{msg}}</p>
+                </div>
+            {% endif %}
+        
+        {% endfor %}
+        
+    {% endif %}
+
+    <h1 class="uk-margin-top">{{user.account.name}} - Users</h1>
+    <hr class="uk-divider-icon"/>
+    <a href="#new-user-modal" uk-toggle class="uk-button uk-button-primary">Add User</a>
+    <table class="uk-table uk-table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>User Id</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in users %}
+                <tr>
+                    <td class="uk-text-bolder">
+                        {{u.get_full_name}}
+                    </td>
+                    <td>{{u.uuid}}</td>
+                    <td>{{u.email}}</td>
+                    <td>{{u.readable_role}}</td>
+                    
+                    <td>
+                        <a href="" uk-icon="icon: pencil" uk-tooltip="Edit {{u.get_full_name}}"></a>
+                        {% if u != user %}
+                            <a href="#delete-confirmation-{{u.uuid}}" uk-toggle uk-icon="icon: ban" uk-tooltip="Deactivate {{u.get_full_name}}"></a>
+                        {% endif %}
+                        
+                    </td>
+                </tr>
+
+                <div id="delete-confirmation-{{u.uuid}}" uk-modal>
+                    <div class="uk-modal-dialog">
+                        <form action="{% url 'users:deactivate' uuid=u.uuid %}" method="get">
+                            <div class="uk-modal-header">
+                                <h2 class="uk-modal-title">Are you sure?</h2>
+                            </div>
+                            <div class="uk-modal-body">
+                                <p>Are you sure you want to deactivate <strong>{{u.get_full_name}}</strong>?</p>
+                            </div>
+                            <div class="uk-modal-footer">
+                                <button class="uk-modal-close uk-button uk-button-danger" type="button">Cancel</button>
+                                <button class="uk-button uk-button-primary" type="submit">Confirm Deactivation</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div id="new-user-modal" uk-modal>
+        <div class="uk-modal-dialog uk-modal-body">
+            <h2 class="uk-modal-title">Add User</h2>
+            <form action="{% url 'users:create' %}" method="POST">
+                {% csrf_token %}
+                <p>{{new_user_form.as_p}}</p>
+                <p class="uk-text-right">
+                    <button class="uk-button uk-button-default uk-modal-close" type="button">Cancel</button>
+                    <button class="uk-button uk-button-primary" type="submit">Save</button>
+                </p>
+            </form>
+        </div>
+    </div>
+{% endblock body %}
+

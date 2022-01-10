@@ -1,0 +1,13 @@
+{% extends '../../layouts/base.html' %}
+
+{% block body %}
+    <ul class="uk-breadcrumb uk-margin-bottom">
+        <li><a href="{% url 'inspection_forms:list' %}">All Forms</a></li>
+        <li class="uk-disabled"><a>{{object.title}}</a></li>
+    </ul>
+    <h2>{{object.title}} <a href="{% url 'inspection_forms:edit' uuid=object.uuid %}" uk-icon="icon: pencil" uk-tooltip="Edit"></a></h2>
+    <hr class="uk-divider-icon"/>
+    <div class="fb-render">
+        <div id="fb-template">{{form_json|safe}}</div>
+    </div>
+{% endblock body %}
