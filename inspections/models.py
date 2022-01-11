@@ -40,11 +40,11 @@ class InspectionManager(models.Manager):
 
 
 class Inspection(BaseModel):
-    form = models.ForeignKey(InspectionForm, on_delete=models.RESTRICT)
-    item = models.ForeignKey(InspectionItem, on_delete=models.RESTRICT)
-    account = models.ForeignKey(Account, on_delete=models.RESTRICT)
+    form = models.ForeignKey(InspectionForm, on_delete=models.PROTECT)
+    item = models.ForeignKey(InspectionItem, on_delete=models.PROTECT)
+    account = models.ForeignKey(Account, on_delete=models.PROTECT)
     json = models.JSONField(null=False, blank=False)
-    completed_by = models.ForeignKey(User, on_delete=models.RESTRICT)
+    completed_by = models.ForeignKey(User, on_delete=models.PROTECT)
     completed_date = models.DateTimeField(auto_now_add=True)
     completed_past_due = models.BooleanField()
     failed_inspection = models.BooleanField(null=False)

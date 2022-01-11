@@ -14,7 +14,6 @@ const builderOptions = {
 
 // build the form builder object to render
 const formBuilder = $('#fb-editor').formBuilder(builderOptions);
-const logFormFB = $('#fb-log-form').formBuilder(builderOptions);
 
 
 // handle form clear/save button actions
@@ -28,7 +27,7 @@ jQuery(function($) {
         const requestUrl = form.action
         const method = form.method
 
-        let json = formBuilder.actions.getData('json')
+        let json = formBuilder.actions.getData('json', true)
         let title = $('#form-title-input').val()
         let form_data = {form_json: json, title: title}
         let csrfToken = getCookie('csrftoken');

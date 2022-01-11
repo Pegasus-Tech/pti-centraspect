@@ -26,7 +26,7 @@ def create_initial_account(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authentication', '0004_alter_user_account'),
+        ('authentication', '0001_initial'),
     ]
 
     operations = [
