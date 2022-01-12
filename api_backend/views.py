@@ -30,9 +30,9 @@ class FormItemAPIView(APIView):
             "inspection_item_uuid":item.uuid,
             "inspection_item_owner":item.assigned_to.get_full_name() if item.assigned_to is not None else None,
             "inspection_item_owner_uuid":item.assigned_to.uuid if item.assigned_to is not None else None,
-            "inspection_form_title":item.form.title,
-            "inspection_form_uuid":item.form.uuid,
-            "inspection_form":item.form.form_json
+            "inspection_form_title":item.form.title if item.form is not None else None,
+            "inspection_form_uuid":item.form.uuid if item.form is not None else None,
+            "inspection_form":item.form.form_json if item.form is not None else None
             }
         return Response(serialized)
 

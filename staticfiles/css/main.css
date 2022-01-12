@@ -1,0 +1,37 @@
+body, html {
+    /* font-family: 'Lucida Console', arial!important; */
+}
+.centra-label-red {
+    background-color: #C5283D;
+    color: #fff
+}
+
+.centra-label-primary {
+    background: #1e87f0;
+    color: #fff
+}
+
+.centra-label-yellow {
+    background: #fec601;
+    color: #fff
+}
+
+.centra-label-purple {
+    background: #5D5179;
+    color: #fff
+}
+
+.centra-label-orange {
+    background: #fe6847;
+    color: #fff
+}
+
+.centra-label-green {
+    background: #009688;
+    color: #fff
+}
+
+.centra-label-grey {
+    background: #dfe0e2;
+    color: rgb(36, 36, 36)
+}
