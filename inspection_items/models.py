@@ -96,6 +96,7 @@ class InspectionItem(BaseModel):
 def generate_qr_code_callback(sender, instance, created, *args, **kwargs):
     if created:
         data = serialize_inspection_item(instance)
+        print(f'Generated QR Code DATA :: {data}')
         qr_code = generate_qr_code_image(account=instance.account, instance_uuid=instance.uuid, serialized_data=data)
         instance.qr_code = qr_code
         instance.save()
