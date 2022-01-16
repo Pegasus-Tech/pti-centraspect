@@ -10,6 +10,5 @@ class InspectionCalendarView(LoginRequiredMixin, View):
         template_name = 'dashboard/inspection_calendar/calendar.html'
         upcoming_inpsections = InspectionItem.objects.get_all_for_account(self.request.user.account)
         
-        
         return render(self.request, template_name, {"items": serialize('json', upcoming_inpsections)})
 

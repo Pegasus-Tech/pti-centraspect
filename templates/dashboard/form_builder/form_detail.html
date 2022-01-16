@@ -7,7 +7,16 @@
     </ul>
     <h2>{{object.title}} <a href="{% url 'inspection_forms:edit' uuid=object.uuid %}" uk-icon="icon: pencil" uk-tooltip="Edit"></a></h2>
     <hr class="uk-divider-icon"/>
-    <div class="fb-render">
-        <div id="fb-template">{{form_json|safe}}</div>
+    <div class="form-detail-container">
+        <div class="fb-render">
+            <div id="fb-template">{{form_json|safe}}</div>
+        </div>
     </div>
+    
 {% endblock body %}
+
+{% block added_js %}
+    <script>
+        
+    </script>
+{% endblock added_js %}

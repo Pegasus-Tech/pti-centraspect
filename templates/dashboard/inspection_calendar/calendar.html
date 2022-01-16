@@ -8,19 +8,7 @@
 {% block added_js %}
     <script type="module">
         import {loadFullCalendar} from "../../../../static/js/inspectionCalendar.js"
-        let items = {{items|safe}}
-        let data = []
-        for(let i = 0; i<items.length; i++) {
-            data.push(
-                {
-                    id: items[i].fields.uuid,
-                    title: items[i].fields.title,
-                    start: items[i].fields.next_inspection_date
-                }
-            )
-        }
-        console.log(data)
-        $(document).ready(loadFullCalendar(data));
+        $(document).ready(loadFullCalendar({{items|safe}}));
     </script>
 
 {% endblock added_js %}

@@ -17,43 +17,72 @@ const formBuilder = $('#fb-editor').formBuilder(builderOptions);
 
 
 // handle form clear/save button actions
+// and form validation on creation
 jQuery(function($) {
+
+    $('#form-title-input').on('input', function() {
+        let input = $('#form-title-input')
+
+        if(input.hasClass('empty-input-field-warning')) {
+            input.removeClass('empty-input-field-warning')
+            $('.form-title-error-message').attr('hidden', true)
+        }
+    })
+
     $('#clear-form').on('click', function() {
         formBuilder.actions.clearFields();
     });
 
     $('#save-form').on('click', function() {
-        const form = $('#new-inspection-form-form')[0]
-        const requestUrl = form.action
-        const method = form.method
 
-        let json = formBuilder.actions.getData('json', true)
-        let title = $('#form-title-input').val()
-        let form_data = {form_json: json, title: title}
-        let csrfToken = getCookie('csrftoken');
-        console.log('token', csrfToken)
-        if(csrfToken) {
-            $.ajax({
-                url: requestUrl,
-                method: method,
-                headers: {
-                    'X-CSRFToken': csrfToken
-                },
-                data: form_data
-            }).success(response => {
-                console.log(response);
-                window.location.href = response.url
-            }).error(e => {
-                console.error(e);
-            })
-        } else {
-            alert('No Sercurity Token Available. Please logout and login again to retore your session security cookies.')
+        if(titleFilled()) {
+            const form = $('#new-inspection-form-form')[0]
+            const requestUrl = form.action
+            const method = form.method
+    
+            let json = formBuilder.actions.getData('json', true)
+            let title = $('#form-title-input').val()
+            let form_data = {form_json: json, title: title}
+            let csrfToken = getCookie('csrftoken');
+            console.log('token', csrfToken)
+            if(csrfToken) {
+                $.ajax({
+                    url: requestUrl,
+                    method: method,
+                    headers: {
+                        'X-CSRFToken': csrfToken
+                    },
+                    data: form_data
+                }).success(response => {
+                    console.log(response);
+                    window.location.href = response.url
+                }).error(e => {
+                    console.error(e);
+                })
+            } else {
+                alert('No Sercurity Token Available. Please logout and login again to retore your session security cookies.')
+            }
         }
     })
+
+    function titleFilled() {
+        let title = $('#form-title-input')
+
+        if(!title.val()) {
+            $('.form-title-error-message').removeAttr('hidden')
+            title.addClass('empty-input-field-warning') 
+            return false
+        } else {
+            return true
+        }
+    }
+
 });
 
 
-// render the form on loading
+// renders the form on the form detail page
+// this method makes all the fields disabled 
+//so they can't be filled out
 jQuery(function($) {
     let fbTemplate = document.getElementById('fb-template');
     if(fbTemplate){
@@ -61,9 +90,25 @@ jQuery(function($) {
             dataType: 'json',
             formData: fbTemplate.textContent
           });
+        let inputs = $('input')
+        let selects = $('select')
+        let textareas = $('textarea')
+        
+        for(let i = 0; i < inputs.length; i++) {
+            inputs[i].disabled = true
+        }
+
+        for(let i = 0; i < selects.length; i++) {
+            selects[i].disabled = true
+        }
+
+        for(let i = 0; i < textareas.length; i++) {
+            textareas[i].disabled = true
+        }
     }
 });
 
+// renders the form when loaded to be filled out on the log inspection page
 jQuery(function($) {
     let fbTemplate = document.getElementById('fb-log-form');
     if(fbTemplate){

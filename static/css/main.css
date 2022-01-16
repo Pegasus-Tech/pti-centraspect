@@ -35,3 +35,17 @@ body, html {
     background: #dfe0e2;
     color: rgb(36, 36, 36)
 }
+
+.empty-input-field-warning {
+    border: 1px solid #C5283D;
+}
+
+.empty-input-field-warning:focus {
+	outline: none;
+  	border: 1px solid #C5283D;
+}
+
+.form-title-error-message {
+    color: #C5283D;
+}
+
