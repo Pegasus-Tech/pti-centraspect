@@ -19,17 +19,17 @@ from django.urls import path, re_path
 from authentication.views import registration_view, login_view, logout_view
 from dashboard.views import main_dashboard_view
 from rest_framework import permissions
-from drf_yasg.views import get_schema_view
-from drf_yasg import openapi
+# from drf_yasg.views import get_schema_view
+# from drf_yasg import openapi
 
-schema_view = get_schema_view(
-    openapi.Info(
-        title="Centraspect API",
-        default_version='v1',
-        description="Centraspect API endpoint documentation",
-    ),
-    public=True,
-    permission_classes=(permissions.AllowAny,))
+# schema_view = get_schema_view(
+#     openapi.Info(
+#         title="Centraspect API",
+#         default_version='v1',
+#         description="Centraspect API endpoint documentation",
+#     ),
+#     public=True,
+#     permission_classes=(permissions.AllowAny,))
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -44,6 +44,6 @@ urlpatterns = [
     path('dashboard/form-builder', include('inspection_forms.urls', namespace="inspection_forms")),
     path('dashboard/inspections', include('inspections.urls', namespace='inspections')),
     
-    path('api/docs', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    # path('api/docs', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('api/', include('api_backend.urls', namespace='api'))
 ]
