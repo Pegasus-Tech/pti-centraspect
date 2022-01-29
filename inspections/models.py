@@ -4,6 +4,7 @@ from inspection_forms.models import InspectionForm
 from inspection_items.models import InspectionItem
 from authentication.models import Account, User
 
+
 class InspectionManager(models.Manager):
 
     def get_all_for_account(self, account, *args, **kwargs):
@@ -48,3 +49,11 @@ class Inspection(BaseModel):
     completed_date = models.DateTimeField(auto_now_add=True)
     completed_past_due = models.BooleanField()
     failed_inspection = models.BooleanField(null=False)
+
+    def to_json(self):
+        return {
+            "uuid": self.uuid,
+            "completed_data": self.completed_date,
+            "completed_past_due": self.completed_past_due,
+            "failed_inspection": self.failed_inspection
+        }

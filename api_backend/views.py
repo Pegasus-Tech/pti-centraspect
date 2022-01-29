@@ -3,7 +3,9 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from inspection_items.models import InspectionItem
 from inspection_forms.models import InspectionForm
+from inspections.mixins import LogInspectionMixin
 from .serializers import InspectionFormSerializer
+from authentication.models import User
 
 from rest_framework import status
 from rest_framework.views import APIView
@@ -20,7 +22,7 @@ def get_form_from_item(request, uuid):
         serialized = InspectionFormSerializer(item, many=False)
         return JsonResponse(serialized.data, safe=False)
 
-class FormItemAPIView(APIView):
+class FormItemAPIView(LogInspectionMixin, APIView):
 
     def get(self, request, uuid):
         print(f'looking for form :: {uuid}')
@@ -37,4 +39,30 @@ class FormItemAPIView(APIView):
         return Response(serialized)
 
     def post(self, request, uuid):
-        pass
+        print(f"Getting reqeust :: {self.request.data['inspection_form_filled']} for form uuid {uuid}")
+        data = self.request.data
+        item = InspectionItem.objects.get(uuid=uuid)
+        disposition = None
+
+        # TODO - update User to be the authed user from the mobile app
+        user = User.objects.filter(account__user__is_superuser=True).first()
+        try:
+            disposition = data['disposition']
+        except KeyError:
+            print(f'No disposition attached to request')
+        finally:
+            print(f'Disposition = {disposition}')
+            inspection = self.log_inspection(inspection_item=item,
+                                             logged_by=user,
+                                             completed_form=data['inspection_form_filled'],
+                                             inspection_disposition=disposition or 'pass')
+            if inspection.get('success'):
+                print(f"SUCCESS :: {inspection.get('inspection')}")
+                inspection_log = inspection.get('inspection')
+                item = self.update_inspection_item_due_dates(inspection=inspection.get('inspection'))
+                resp = {'url': f'/dashboard/inspection-items/{item.uuid}', "inspection_log": inspection_log.to_json()}
+                return JsonResponse(resp, status=201)
+            else:
+                print(f"FAILURE :: {inspection.get('inspection')}")
+                resp = {'url': f'/dashboard/inspections/new/{item.uuid}'}
+                return JsonResponse(resp, status=500)

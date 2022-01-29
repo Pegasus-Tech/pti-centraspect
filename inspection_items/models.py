@@ -30,9 +30,24 @@ class InspectionItemManager(models.Manager):
             qs = self.get_queryset().all()
             qs = qs.filter(account=account)
             return qs.filter(is_active=True)
-    
-        
-    
+
+    def get_count_past_due(self, account):
+        if account is not None:
+            qs = self.get_queryset().all()
+            qs.filter(account=account)
+            qs.filter(next_inspection_date__lt=date.today())
+            return qs.filter(is_active=True)
+
+    def get_closure_rate_for_account(self, account):
+        if account is not None:
+            qs = self.get_queryset().all()
+            qs = qs.filter(account=account)
+            qs = qs.filter(is_active=True)
+
+            total = qs
+            on_time = qs.filter()
+
+            return
 
 class InspectionInterval(models.TextChoices):
     DAILY = 'daily', _('Daily')

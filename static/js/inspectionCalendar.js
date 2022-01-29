@@ -1,19 +1,20 @@
 
 export function loadFullCalendar(inspection_data) {
     let data = []
-
-    for(let i = 0; i<inspection_data.length; i++) {
-      let color = getEventColor(inspection_data[i])
-        data.push(
-            {
-                id: inspection_data[i].fields.uuid,
-                title: inspection_data[i].fields.title,
-                start: inspection_data[i].fields.next_inspection_date,
-                backgroundColor: color,
-                borderColor: color,
-                url: '/dashboard/inspection-items/'+inspection_data[i].fields.uuid
-            }
-        )
+    if(inspection_data) {
+        for(let i = 0; i<inspection_data.length; i++) {
+            let color = getEventColor(inspection_data[i])
+            data.push(
+                {
+                    id: inspection_data[i].fields.uuid,
+                    title: inspection_data[i].fields.title,
+                    start: inspection_data[i].fields.next_inspection_date,
+                    backgroundColor: color,
+                    borderColor: color,
+                    url: '/dashboard/inspection-items/'+inspection_data[i].fields.uuid
+                }
+            )
+        }
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -28,9 +29,12 @@ export function loadFullCalendar(inspection_data) {
         },
         initialView: 'dayGridMonth',
         headerToolbar:{
-          start: 'prev,next today',
-          center: 'title',
-          end: 'dayGridMonth,list'
+          // start: 'prev,next today',
+          // center: 'title',
+          // end: 'dayGridMonth,list'
+            start: 'prev,next',
+            center: 'title',
+            end: 'today'
         },
         themeSystem: 'bootstrap',
         events: data

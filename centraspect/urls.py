@@ -17,7 +17,8 @@ from django.conf.urls import include
 from django.contrib import admin
 from django.urls import path, re_path
 from authentication.views import registration_view, login_view, logout_view
-from dashboard.views import main_dashboard_view
+from dashboard.views import DashboardView
+from .views import LandingPage
 from rest_framework import permissions
 # from drf_yasg.views import get_schema_view
 # from drf_yasg import openapi
@@ -32,12 +33,13 @@ from rest_framework import permissions
 #     permission_classes=(permissions.AllowAny,))
 
 urlpatterns = [
+    path('', LandingPage.as_view(), name="landing_page"),
     path('admin/', admin.site.urls),
     path('signup/', registration_view, name='signup'),
     path('login/', login_view, name='login'),
     path('logout/', logout_view, name='logout'),
     
-    path('dashboard/', main_dashboard_view, name='dashboard'),
+    path('dashboard/', DashboardView.as_view(), name='dashboard'),
     path('dashboard/users', include('authentication.urls', namespace="users")),
     path('dashboard/inspection-items', include('inspection_items.urls', namespace="inspection_items")),
     path('dashboard/inspection-calendar', include('inspection_calendar.urls', namespace="inspection_calendar")),
