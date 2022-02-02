@@ -79,7 +79,8 @@ class AccountUsersListView(LoginRequiredMixin, ListView):
         context["users"] = User.objects.filter(account=self.request.user.account).filter(is_active=True)
         context["new_user_form"] = AdminCreateUserForm(None)
         return context
-    
+
+
 class AccountCreateUserView(LoginRequiredMixin, CreateView):
     model = User
     
@@ -102,7 +103,8 @@ class AccountCreateUserView(LoginRequiredMixin, CreateView):
             print(f'ERROR {user_form.errors}')
             messages.error(request, user_form.errors)
             return redirect("users:all")
-    
+
+
 class AccountUserDeactivateView(LoginRequiredMixin, View):
     model = User
     

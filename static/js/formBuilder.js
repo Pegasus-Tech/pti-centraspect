@@ -3,9 +3,9 @@ import { getCookie } from './utils.js'
 // setup the form builder options
 const builderOptions = {
     controlPosition: 'right',
-    controlOrder: ['header', 'paragraph', 'text', 'textarea', 'date', 'select', 'checkbox-group', 'radio-group', 'file'],
+    controlOrder: ['header', 'paragraph', 'text', 'textarea', 'date', 'select', 'checkbox-group', 'radio-group'],
     disabledActionButtons: ['data', 'save', 'clear'],
-    disableFields: ['autocomplete', 'hidden', 'starRating', 'button'],
+    disableFields: ['autocomplete', 'hidden', 'starRating', 'button', 'file'],
     disabledAttrs: ['className', 'toggle', 'access', 'name'],
       onAddField: function(fieldId, fieldData) {
         fieldData = processFormAttributes(fieldData)
