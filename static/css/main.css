@@ -1,6 +1,21 @@
 body, html {
     /* font-family: 'Lucida Console', arial!important; */
 }
+
+.centra-login-button {
+    background-color: transparent;
+    color:white;
+    outline: white;
+    border: 1px solid white;
+    border-radius: 20px;
+}
+
+.centra-login-button:hover {
+    text-decoration: none;
+    color: white;
+    background-color: #1e87f0;
+}
+
 .centra-label-red {
     background-color: #C5283D;
     color: #fff

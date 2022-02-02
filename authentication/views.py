@@ -12,7 +12,10 @@ from authentication.models import User, Account
 
 def registration_view(request):
     print(f'got request :: {request}')
+
     if request.method == 'GET':
+        if request.user.is_authenticated:
+            return redirect('dashboard')
         return render(request, 'registration/register.html')
     
     if request.method == 'POST':
@@ -33,7 +36,7 @@ def registration_view(request):
         
         if authed_user is not None:
             login(request=request, user=authed_user)
-            return render(request=request, template_name='registration/register.html')
+            return render(request=request, template_name='dashboard/index.html')
            
 
 def login_view(request):
@@ -52,6 +55,7 @@ def login_view(request):
             # this needs to redirect on login
             return redirect('dashboard')
         else:
+            print(f'No user found with credentials u: {username} p: {password}')
             context['error'] = "Invalid username or password"
             return render(request, 'registration/login.html', context)
     

@@ -127,7 +127,7 @@ DATABASES = {
     # }
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'centra-main',
+        'NAME': os.environ.get('CENTRA_DB_NAME') or 'centra-main',
         'USER': os.environ.get('CENTRA_DB_USER'),
         'PASSWORD': os.environ.get('CENTRA_DB_PASSWORD'),
         'HOST': 'localhost',

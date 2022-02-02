@@ -1,20 +1,27 @@
 {% load static %}
 
 <nav class="uk-navbar-container" uk-navbar>
+
+    <div class="uk-navbar-left uk-margin-left">
+        <a class="uk-navbar-item uk-logo" href="/">
+            <img class="" src="{% static '/images/centraspect_logo_trans.png' %}" width=150/>
+        </a>
+    </div>
+
     <div class="uk-navbar-right">
         <ul class="uk-navbar-nav uk-margin-right">
             {% if user.is_authenticated %}
                 <li><a href="{% url 'logout' %}">Logout</a></li>
             {% else %}
                 {% if 'login' in request.get_full_path%}
-                    <li class="uk-active"><a href="{% url 'login' %}">Login</a></li>
-                    <li><a href="{% url 'signup' %}">Register</a></li>
+                    <li class="uk-active"><a class="uk-link-text" href="{% url 'login' %}">Login</a></li>
+                    <li><a class="uk-link-text" href="{% url 'signup' %}">Register</a></li>
                 {% elif 'signup' in request.get_full_path %}
-                    <li><a href="{% url 'login' %}">Login</a></li>
-                    <li class="uk-active"><a href="{% url 'signup' %}">Register</a></li>
+                    <li><a class="uk-link-text" href="{% url 'login' %}">Login</a></li>
+                    <li class="uk-active"><a class="uk-link-text" href="{% url 'signup' %}">Register</a></li>
                 {% else %}
-                    <li><a href="{% url 'login' %}">Login</a></li>
-                    <li><a href="{% url 'signup' %}">Register</a></li>
+                    <li><a class="uk-link-text" href="{% url 'login' %}">Login</a></li>
+                    <li><a class="uk-link-text" href="{% url 'signup' %}">Register</a></li>
                 {% endif %}
             {% endif %}
         </ul>

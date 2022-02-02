@@ -1,39 +1,61 @@
 {% extends '../layouts/base.html' %}
-
+{% load static %}
 {% block body %}
-{% if user.is_authenticated %}
-    Hello {{user.first_name}}, {{user.username}}, {{user.email}}, {{user.account}}
-{% endif %}
- <div class="uk-container uk-container-xsmall uk-margin-top">
-    <form action="{% url 'signup' %}" method='POST'>
-        {% csrf_token %}
-        <fieldset class="uk-fieldset">
 
-            <legend class="uk-legend">Signup</legend>
+    <div class="uk-container uk-margin-large-top">
+        <div class="uk-card-default">
+            <div class="uk-card-body" uk-grid>
+                <div class="uk-width-1-2 uk-padding">
+                    <form class="uk-padding" action="{% url 'signup' %}" method='POST'>
+                        {% csrf_token %}
+                        <fieldset class="uk-fieldset">
 
-            <div class="uk-margin">
-                <input class="uk-input" name='company_name' type="text" placeholder="Company Name">
-            </div>
-            <div class="uk-grid">
-                <div class="uk-width-1-2">
-                    <input class="uk-input" name='first_name' type="text" placeholder="First Name">
+                            <legend class="uk-legend">Register</legend>
+
+                            <div class="uk-margin">
+                                <input class="uk-input" name='company_name' type="text" placeholder="Company Name">
+                            </div>
+                            <div class="uk-grid">
+                                <div class="uk-width-1-2">
+                                    <input class="uk-input" name='first_name' type="text" placeholder="First Name">
+                                </div>
+                                <div class="uk-width-1-2">
+                                    <input class="uk-input" name='last_name' type="text" placeholder="Last Name">
+                                </div>
+                            </div>
+
+                            <div class="uk-margin">
+                                <input class="uk-input" name='email' type="email" placeholder="Email">
+                            </div>
+                            <div class="uk-margin">
+                                <input class="uk-input" name='password' type="password" placeholder="Password">
+                            </div>
+                            <button class="uk-button uk-button-primary uk-width-1-1 uk-margin-small-bottom" type="submit">Register</button>
+
+                        </fieldset>
+                    </form>
                 </div>
-                <div class="uk-width-1-2">
-                    <input class="uk-input" name='last_name' type="text" placeholder="Last Name">
+
+                <div class="uk-width-1-2 uk-text-center uk-padding-remove" style="background-color: #1E87F0; ">
+                    <div class="uk-padding uk-align-center" style="margin-top: 10%">
+                        <p class="uk-align-center">
+                            <img src="{% static '/images/qr_icon.png' %}" width=180>
+                            <br/><span class="uk-text-large" style="color:white">The New Way To Perform Inspections</span>
+                        </p>
+
+                        <p class="uk-margin-medium uk-text-small" style="color: white">
+                            Already have an account?<br/> <br/>
+                            <a class="centra-login-button uk-button" href="/login">Log in</a>
+                        </p>
+
+
+
+                    </div>
+
                 </div>
             </div>
-    
-            <div class="uk-margin">
-                <input class="uk-input" name='email' type="email" placeholder="Email">
-            </div>
-            <div class="uk-margin">
-                <input class="uk-input" name='password' type="password" placeholder="Password">
-            </div>
-        </fieldset>
-
-        <button class="uk-button uk-button-primary" type="submit">Signup</button>
-    </form>
- </div>
+        </div>
+    </div>
     
 {% endblock body %}
 

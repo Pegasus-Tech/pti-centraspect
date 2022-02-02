@@ -19,14 +19,14 @@
         <div class="uk-overlay uk-position-top-left uk-light">
             <img src="static/images/centraspect_logo_trans.png" alt="" width="200">
         </div>
-        {#        <div class="uk-overlay uk-position-top-right uk-light">#}
-        {#            <h4><strong>Get Early Access</strong></h4>#}
-        {#        </div>#}
+                <div class="uk-overlay uk-position-top-right uk-light">
+                   <a href="{% url 'login' %}" class="uk-link-reset">Login</a>
+                </div>
         <div class="uk-overlay uk-position-center uk-text-center uk-light">
             <h1 class="uk-text-bolder uk-visible@s">The New Way<br/>To Perform Inspections</h1>
             <h5 class="uk-hidden@s">The New Way<br/>To Perform Inspections</h5>
             <br>
-            <button class="uk-button uk-button-primary uk-button uk-border-pill" style="background-color: #1E87F0; color:white">Get Started</button>
+            <a href="{% url 'signup' %}" class="uk-button uk-button-primary uk-button uk-border-pill" style="background-color: #1E87F0; color:white">Get Started</a>
         </div>
     </div>
 </div>
@@ -82,7 +82,7 @@
                 <p class="uk-text-meta uk-text-default">Track your inspection compliance rates with easy to use and simple metrics.
                 No more bloated charts and data tables that are hard to read. Get simple, and concise
                 metrics that tell you exactly what you need to know.</p>
-                <button class="uk-button uk-button-primary uk-button uk-border-pill" style="background-color: #1E87F0; color:white">Get Started</button>
+                <a href="{% url 'signup' %}" class="uk-button uk-button-primary uk-button uk-border-pill" style="background-color: #1E87F0; color:white">Get Started</a>
             </div>
 
             <div class="uk-width-1-2">
@@ -108,7 +108,7 @@
                     without the hassle of paper documents.
                     <br/>
                 </p>
-                <button class="uk-button uk-button-primary uk-button uk-border-pill" style="background-color: white; color:#1E87F0">Get Started</button>
+                <a href="{% url 'signup' %}" class="uk-button uk-button-primary uk-button uk-border-pill" style="background-color: white; color:#1E87F0">Get Started</a>
             </div>
 
         </div>

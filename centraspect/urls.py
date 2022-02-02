@@ -35,7 +35,7 @@ from rest_framework import permissions
 urlpatterns = [
     path('', LandingPage.as_view(), name="landing_page"),
     path('admin/', admin.site.urls),
-    path('signup/', registration_view, name='signup'),
+    path('register/', registration_view, name='signup'),
     path('login/', login_view, name='login'),
     path('logout/', logout_view, name='logout'),
     
