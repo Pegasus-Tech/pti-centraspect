@@ -33,7 +33,7 @@ def get_on_time_closure_rate(account, start_date):
         return 0
 
     closure_rate = (on_time_completions.count() / all_this_year.count()) * 100
-    return round(closure_rate, 2)
+    return round(closure_rate, 0)
 
 
 def get_open_past_due_counts(account, start_date):
