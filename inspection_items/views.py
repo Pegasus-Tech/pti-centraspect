@@ -34,7 +34,7 @@ class InspectionItemCreateView(LoginRequiredMixin, QRCodeGeneratorMixin, CreateV
         form_class.fields['form'].queryset = self.request.user.account.inspectionform_set.all()
         return form_class
 
-    def post(self, **kwargs: Any) -> Union[HttpResponseRedirect, HttpResponsePermanentRedirect]:
+    def post(self, request, **kwargs: Any) -> Union[HttpResponseRedirect, HttpResponsePermanentRedirect]:
         print(f'REQUEST :: {self.request.POST}')
         new_item = InspectionItemForm(self.request.POST or None).save(commit=False)
 
@@ -60,7 +60,7 @@ class InspectionItemDetailView(LoginRequiredMixin, DetailView):
 class InspectionItemUpdateView(LoginRequiredMixin, UpdateView):
     model = InspectionItem
 
-    def get(self, uuid, **kwargs: Any) -> HttpResponse:
+    def get(self, request, uuid, **kwargs: Any) -> HttpResponse:
         template_name = 'dashboard/inspection_items/update_inspection_item.html'
         inspection_item = get_object_or_404(InspectionItem, uuid=uuid)
 
@@ -72,7 +72,7 @@ class InspectionItemUpdateView(LoginRequiredMixin, UpdateView):
             context = {"error_message": f"No Inspection Item found for id {uuid}"}
             return render(request=self.request, template_name='400.html')
 
-    def post(self, uuid, **kwargs: Any) -> Union[HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect]:
+    def post(self, request, uuid, **kwargs: Any) -> Union[HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect]:
         inspection_item = get_object_or_404(InspectionItem, uuid=uuid)
         form = InspectionItemForm(self.request.POST or None, instance=inspection_item)
 
@@ -86,7 +86,7 @@ class InspectionItemUpdateView(LoginRequiredMixin, UpdateView):
 class InspectionItemDeleteView(LoginRequiredMixin, View):
     model = InspectionItem
 
-    def get(self, uuid, **kwargs: Any) -> Union[HttpResponseRedirect, HttpResponsePermanentRedirect]:
+    def get(self, request, uuid, **kwargs: Any) -> Union[HttpResponseRedirect, HttpResponsePermanentRedirect]:
         instance = get_object_or_404(InspectionItem, uuid=uuid)
         instance.is_active = False
         instance.is_deleted = True
