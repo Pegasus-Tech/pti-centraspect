@@ -43,7 +43,7 @@ def get_open_past_due_counts(account, start_date):
     rtn['all'] = all_this_year.count()
 
     # get inspection items that are past due
-    items = InspectionItem.objects.filter(account=account)
+    items = InspectionItem.objects.filter(account=account).filter(is_deleted=False)
     items_this_year = items.filter(next_inspection_date__gte=start_date)
     opd = items_this_year.filter(next_inspection_date__lt=datetime.now().date())
     rtn['opd'] = opd.count()

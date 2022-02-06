@@ -24,6 +24,8 @@ def qr_directory_path(instance, filename):
 
 
 class InspectionItemManager(models.Manager):
+    def get_by_natural_key(self, uuid):
+        return self.get(uuid=uuid)
     
     def get_all_for_account(self, account):
         if account is not None:
@@ -106,7 +108,8 @@ class InspectionItem(BaseModel):
     @property
     def is_due_today(self):
         return date.today() == self.next_inspection_date
-        
+
+
 @receiver(post_save, sender=InspectionItem)
 def generate_qr_code_callback(sender, instance, created, *args, **kwargs):
     if created:

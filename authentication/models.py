@@ -14,14 +14,12 @@ class Address(models.Model):
 
 
 class AccountManager(models.Manager):
-    def get_by_natural_key(self, name, username):
-        qs = self.get_queryset()
-        accts = qs.filter(name=name)
-        for acct in accts:
-            users = acct.user_set.all()
-            for user in users:
-                if user.username == username:
-                    return acct
+    def get_by_natural_key(self, userUuid):
+        user = User.objects.get(uuid=userUuid)
+        if user is not None:
+            return self.get(pk=user.account.pk)
+
+        return None
 
 
 class Account(BaseModel):
@@ -42,8 +40,8 @@ class Roles(models.TextChoices):
 
 
 class UserManager(models.Manager):
-    def get_by_natural_key(self, username):
-        return self.get(username=username)
+    def get_by_natural_key(self, uuid):
+        return self.get(uuid=uuid)
 
 
 class User(AbstractUser, PermissionsMixin):

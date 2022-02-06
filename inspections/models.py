@@ -6,6 +6,8 @@ from authentication.models import Account, User
 
 
 class InspectionManager(models.Manager):
+    def get_by_natural_key(self, uuid):
+        return self.get(uuid=uuid)
 
     def get_all_for_account(self, account, *args, **kwargs):
         if account is not None:
