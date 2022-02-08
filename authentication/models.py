@@ -13,20 +13,10 @@ class Address(models.Model):
     street_two = models.CharField(max_length=1024, blank=True, null=True)
 
 
-class AccountManager(models.Manager):
-    def get_by_natural_key(self, userUuid):
-        user = User.objects.get(uuid=userUuid)
-        if user is not None:
-            return self.get(pk=user.account.pk)
-
-        return None
-
-
 class Account(BaseModel):
     name = models.CharField(max_length=255, unique=False, blank=False, null=False)
     address = models.OneToOneField(Address, on_delete=models.CASCADE, primary_key=False, null=True)
     is_active = models.BooleanField(default=True)
-    objects = AccountManager()
     
     def __str__(self) -> str:
         return f'[name: {self.name}, uuid: {self.uuid}, is_active: {self.is_active}]'
@@ -39,19 +29,12 @@ class Roles(models.TextChoices):
         SYSTEM_ADMIN = "system_admin", _('Superuser')
 
 
-class UserManager(models.Manager):
-    def get_by_natural_key(self, uuid):
-        return self.get(uuid=uuid)
-
-
 class User(AbstractUser, PermissionsMixin):
     
     uuid = models.UUIDField(default=uuid.uuid4)
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     role = models.CharField(max_length=250, choices=Roles.choices, default=0)
     is_active = models.BooleanField(default=True)
-
-    objects = UserManager()
 
     def __str__(self) -> str:
         return f'{self.first_name} {self.last_name} - {self.username}'
