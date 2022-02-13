@@ -1,10 +1,7 @@
-from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.core.serializers import serialize
 from django.db import models
 from django.db.models.deletion import CASCADE
-from django.db.models.signals import pre_save, post_save
+from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
 from authentication.models import User, Account
@@ -15,23 +12,12 @@ from datetime import date
 from .utils import serialize_inspection_item
 
 
-from io import BytesIO, StringIO
-import qrcode
-
 def qr_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
     return f'qr_codes/{_build_bucket_path(instance.account, instance.uuid)}'
 
 
 class InspectionItemManager(models.Manager):
-    def get_by_natural_key(self, uuid):
-        return self.get(uuid=uuid)
-    
-    def get_all_for_account(self, account):
-        if account is not None:
-            qs = self.get_queryset().all()
-            qs = qs.filter(account=account)
-            return qs.filter(is_active=True)
 
     def get_count_past_due(self, account):
         if account is not None:
@@ -50,6 +36,7 @@ class InspectionItemManager(models.Manager):
             on_time = qs.filter()
 
             return
+
 
 class InspectionInterval(models.TextChoices):
     DAILY = 'daily', _('Daily')

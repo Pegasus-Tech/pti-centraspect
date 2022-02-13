@@ -1,10 +1,11 @@
 from datetime import datetime, timedelta
 from inspection_items.models import InspectionItem
+from inspection_items.service import get_all_items_for_account
 from inspections.models import Inspection
 
 
 def get_upcoming_inspections_for_account(account):
-    return InspectionItem.objects.get_all_for_account(account)
+    return get_all_items_for_account(account=account)
 
 
 def get_dashboard_metrics_for_account(account):

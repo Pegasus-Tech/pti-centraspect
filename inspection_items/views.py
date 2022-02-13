@@ -14,14 +14,25 @@ from . import service
 
 
 class InspectionItemListView(LoginRequiredMixin, ListView):
-    template_name = 'dashboard/inspection_items/all_inspection_items.html'
     model = InspectionItem
+    paginate_by = 10
+    template_name = 'dashboard/inspection_items/all_inspection_items.html'
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super(InspectionItemListView, self).get_context_data(**kwargs)
-        items = InspectionItem.objects.get_all_for_account(self.request.user.account)
-        context['inspection_items'] = items
+        acct = self.request.user.account
+        query_params = self.request.GET
+        context['sort_col'] = query_params.get('sort_col') if query_params.get('sort_col') else 'inspection_type'
+        context['sort_dir'] = query_params.get('sort_dir') if query_params.get('sort_dir') else 'desc'
+        context['types'] = service.get_unique_item_types_for_account(account=acct)
+        context['intervals'] = service.get_unique_inspection_intervals_for_account(account=acct)
+
         return context
+
+    def get_queryset(self):
+        req = self.request.GET
+        qs = service.get_all_items_for_account(account=self.request.user.account, params=req)
+        return qs
 
 
 class InspectionItemCreateView(LoginRequiredMixin, QRCodeGeneratorMixin, CreateView):
@@ -72,7 +83,8 @@ class InspectionItemUpdateView(LoginRequiredMixin, UpdateView):
             context = {"error_message": f"No Inspection Item found for id {uuid}"}
             return render(request=self.request, template_name='400.html')
 
-    def post(self, request, uuid, **kwargs: Any) -> Union[HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect]:
+    def post(self, request, uuid, **kwargs: Any) -> \
+            Union[HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect]:
         inspection_item = get_object_or_404(InspectionItem, uuid=uuid)
         form = InspectionItemForm(self.request.POST or None, instance=inspection_item)
 
