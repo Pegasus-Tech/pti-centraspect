@@ -8,21 +8,30 @@
     <hr class="uk-divider-icon"/>
     {% if inspectionitem_list|length > 0 %}
         <ul uk-accordion>
-            <li>
+            <li >
                 <a class="uk-accordion-title" href="#">Filters</a>
                 <div class="uk-accordion-content">
-                    <form>
+                    <form action="{% url 'inspection_items:list' %}" method="post">
+                    {% csrf_token %}
                         <div uk-grid>
                             <div class="uk-width-1-3">
                                 <label for="">Next Due Date Range</label>
                                 <div class="uk-form-stacked">
                                     <label class="uk-form-label">Start Date</label>
                                     <div class="uk-form-controls">
-                                        <input class="uk-input" type="date"/>
+                                        {% if next_due_start %}
+                                            <input class="uk-input" type="date" name="next_due_start" value="{{ next_due_start }}"/>
+                                        {% else %}
+                                            <input class="uk-input" type="date" name="next_due_start"/>
+                                        {% endif %}
                                     </div>
                                     <label class="uk-form-label">End Date</label>
                                     <div class="uk-form-controls">
-                                        <input class="uk-input" type="date"/>
+                                        {% if next_due_end %}
+                                            <input class="uk-input" type="date" name="next_due_end" value="{{ next_due_end }}"/>
+                                        {% else %}
+                                            <input class="uk-input" type="date" name="next_due_end"/>
+                                        {% endif %}
                                     </div>
                                 </div>
 
@@ -33,11 +42,20 @@
                                 <div class="uk-form-stacked">
                                     <label class="uk-form-label">Start Date</label>
                                     <div class="uk-form-controls">
-                                        <input class="uk-input" type="date"/>
+                                        {% if last_start %}
+                                            <input class="uk-input" type="date" name="last_start" value="{{ last_start }}"/>
+                                        {% else %}
+                                            <input class="uk-input" type="date" name="last_start"/>
+                                        {% endif %}
+
                                     </div>
                                     <label class="uk-form-label">End Date</label>
                                     <div class="uk-form-controls">
-                                        <input class="uk-input" type="date"/>
+                                        {% if last_end %}
+                                            <input class="uk-input" type="date" name="last_end" value="{{ last_end }}"/>
+                                        {% else %}
+                                            <input class="uk-input" type="date" name="last_end"/>
+                                        {% endif %}
                                     </div>
                                 </div>
 
@@ -48,34 +66,54 @@
                                 <div class="uk-form-stacked">
                                     <label class="uk-form-label">Start Date</label>
                                     <div class="uk-form-controls">
-                                        <input class="uk-input" type="date"/>
+                                        {% if expiration_start %}
+                                            <input class="uk-input" type="date" name="expiration_start" value="{{ expiration_start }}"/>
+                                        {% else %}
+                                            <input class="uk-input" type="date" name="expiration_start"/>
+                                        {% endif %}
+
                                     </div>
                                     <label class="uk-form-label">End Date</label>
                                     <div class="uk-form-controls">
-                                        <input class="uk-input" type="date"/>
+                                        {% if expiration_end %}
+                                            <input class="uk-input" type="date" name="expiration_end" value="{{ expiration_end }}"/>
+                                        {% else %}
+                                            <input class="uk-input" type="date" name="expiration_end"/>
+                                        {% endif %}
+
                                     </div>
                                 </div>
                             </div>
                             <div class="uk-width-1-2">
                                 <label>Inspection Type</label>
-                                <select class="uk-select" multiple>
-                                    <option value="all" selected>All</option>
-                                    {% for type in types %}
-                                        <option value="{{ type|lower }}">{{ type|upper }}</option>
+                                <select class="uk-select" name="type">
+                                    <option value="all">All</option>
+                                    {% for t in types %}
+                                        {% if t in type %}
+                                            <option value="{{ t|lower }}" selected>{{ t|upper }}</option>
+                                        {% else %}
+                                            <option value="{{ t|lower }}">{{ t|upper }}</option>
+                                        {% endif %}
                                     {% endfor %}
                                 </select>
                             </div>
                             <div class="uk-width-1-2">
                                 <label>Inspection Interval</label>
-                                <select class="uk-select" multiple>
-                                    <option value="all" selected>All</option>
-                                    {% for interval in intervals %}
-                                        <option value="{{ interval|lower }}">{{ interval|upper }}</option>
+                                <select class="uk-select" name="interval">
+                                    <option value="all">All</option>
+                                    {% for i in intervals %}
+                                        {% if i in interval %}
+                                            <option value="{{ i|lower }}" selected>{{ i|upper }}</option>
+                                        {% else %}
+                                            <option value="{{ i|lower }}">{{ i|upper }}</option>
+                                        {% endif %}
                                     {% endfor %}
                                 </select>
                             </div>
 
                         </div>
+                        <button class="uk-button uk-button-primary uk-margin-medium-top" type="submit">Apply Filters</button>
+                        <a href="{% url 'inspection_items:clear_filters' %}" class="uk-button uk-button-secondary uk-margin-medium-top uk-margin-left" type="button">Clear Filters</a>
                     </form>
                 </div>
             </li>

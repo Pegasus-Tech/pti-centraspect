@@ -48,6 +48,9 @@ ADMIN_USER_PW = 'nitsuj3106D!'
 DEBUG = True
 DEBUG_PROPAGATE_EXCEPTIONS = True
 
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+# SESSION_COOKIE_AGE = 60*60*4 # expire after 4 hours
+
 ALLOWED_HOSTS = ['*']
 
 
@@ -82,6 +85,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'centraspect.table_filter_middleware.simple_middleware'
 ]
 
 REST_FRAMEWORK = {

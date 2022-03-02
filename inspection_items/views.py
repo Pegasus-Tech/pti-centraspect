@@ -1,3 +1,4 @@
+import json
 from typing import Any, Dict, Union
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect
@@ -9,7 +10,7 @@ from django.views.generic.edit import UpdateView
 
 from qr_codes.behaviors import QRCodeGeneratorMixin
 from .forms import InspectionItemForm
-from .models import InspectionItem
+from .models import InspectionItem, InspectionItemFilters
 from . import service
 
 
@@ -27,12 +28,48 @@ class InspectionItemListView(LoginRequiredMixin, ListView):
         context['types'] = service.get_unique_item_types_for_account(account=acct)
         context['intervals'] = service.get_unique_inspection_intervals_for_account(account=acct)
 
+        filters_qs = InspectionItemFilters.objects.get_queryset().filter(created_by=self.request.user).filter(is_filtering=True)
+        if filters_qs.count() > 0:
+            filters = json.loads(filters_qs.get().filters)
+            context['next_due_start'] = filters.get('next_due_start')[0]
+            context['next_due_end'] = filters.get('next_due_end')[0]
+            context['last_start'] = filters.get('last_start')[0]
+            context['last_end'] = filters.get('last_end')[0]
+            context['expiration_start'] = filters.get('expiration_start')[0]
+            context['expiration_end'] = filters.get('expiration_end')[0]
+            context['type'] = filters.get('type')
+            context['interval'] = filters.get('interval')
+
         return context
 
     def get_queryset(self):
         req = self.request.GET
         qs = service.get_all_items_for_account(account=self.request.user.account, params=req)
+        filters_qs = InspectionItemFilters.objects.get_queryset().filter(created_by=self.request.user).filter(is_filtering=True)
+
+        if filters_qs.count() > 0:
+            qs = service.set_filters_on_equipment(filters=filters_qs.first())
+
         return qs
+
+    def post(self, *args, **kwargs):
+        filters = {}
+        print(self.request.POST)
+        for k, v in self.request.POST.lists():
+            if k != 'csrfmiddlewaretoken':
+                filters[k] = v
+
+        filter_obj = InspectionItemFilters.objects.filter(created_by=self.request.user).get()
+
+        if filter_obj is None:
+            filter_obj = InspectionItemFilters()
+
+        filter_obj.filters = json.dumps(filters)
+        filter_obj.is_filtering = True
+        filter_obj.created_by = self.request.user
+
+        filter_obj.save()
+        return redirect('inspection_items:list')
 
 
 class InspectionItemCreateView(LoginRequiredMixin, QRCodeGeneratorMixin, CreateView):
@@ -104,3 +141,7 @@ class InspectionItemDeleteView(LoginRequiredMixin, View):
         instance.is_deleted = True
         instance.save()
         return redirect(reverse_lazy('inspection_items:list'))
+
+
+def clear_filters(request):
+    return redirect('inspection_items:list')
