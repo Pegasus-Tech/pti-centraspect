@@ -59,10 +59,12 @@ class InspectionItemListView(LoginRequiredMixin, ListView):
             if k != 'csrfmiddlewaretoken':
                 filters[k] = v
 
-        filter_obj = InspectionItemFilters.objects.filter(created_by=self.request.user).get()
+        filter_qs = InspectionItemFilters.objects.filter(created_by=self.request.user)
 
-        if filter_obj is None:
+        if filter_qs.count() <= 0:
             filter_obj = InspectionItemFilters()
+        else:
+            filter_obj = filter_qs.get()
 
         filter_obj.filters = json.dumps(filters)
         filter_obj.is_filtering = True
