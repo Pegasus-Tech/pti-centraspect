@@ -54,7 +54,7 @@ def get_open_past_due_counts(account, start_date):
 
 def get_pending_next_30_days(account):
     today = datetime.now().date()
-    qs = InspectionItem.objects.filter(account=account)
+    qs = InspectionItem.objects.filter(account=account).filter(is_active=True).filter(is_deleted=False)
     today_or_greater = qs.filter(next_inspection_date__gte=today)
     next_30_days = today_or_greater.filter(next_inspection_date__lte=today + timedelta(days=30))
 

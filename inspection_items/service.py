@@ -2,7 +2,7 @@ import json
 from typing import Iterable, Any
 from django.db.models import QuerySet
 from django.http.request import QueryDict
-from .models import InspectionItem, InspectionItemFilters
+from .models import InspectionItem
 from inspections.models import Inspection
 from authentication.models import Account
 
@@ -43,6 +43,16 @@ def get_all_items_for_account(*, account: Account,
     return []
 
 
+def sort_queryset(*, qs: QuerySet, params: QueryDict = None) -> Iterable[InspectionItem]:
+    if params is not None:
+        sort_col = params.get('sort_col') if params.get('sort_col') else 'next_inspection_date'
+        sort_dir = params.get('sort_dir') if params.get('sort_dir') else 'asc'
+        order_str_prepend = '-' if sort_dir == 'desc' else ''
+        order_str = f'{order_str_prepend}{sort_col}'
+
+        return qs.order_by(order_str)
+
+
 def get_unique_item_types_for_account(*, account: Account) -> Iterable[str]:
     if account is not None:
         qs = InspectionItem.objects.all().filter(is_active=True)
@@ -57,35 +67,3 @@ def get_unique_inspection_intervals_for_account(*, account: Account) -> Iterable
         return qs.order_by('inspection_interval')\
             .values_list('inspection_interval', flat=True)\
             .distinct('inspection_interval')
-
-
-def set_filters_on_equipment(filters: InspectionItemFilters) -> Iterable[Any]:
-    print(f"set_filters() {filters}")
-    filter_json = json.loads(filters.filters)
-    qs = InspectionItem.objects.all().filter(is_active=True)
-
-    if filter_json.get('next_due_start')[0] != '':
-        qs = qs.filter(next_inspection_date__gte=filter_json.get('next_due_start')[0])
-
-    if filter_json.get('next_due_end')[0] != '':
-        qs = qs.filter(next_inspection_date__lte=filter_json.get('next_due_end')[0])
-
-    if filter_json.get('last_start')[0] != '':
-        qs = qs.filter(last_inspection_date__gte=filter_json.get('last_start')[0])
-
-    if filter_json.get('last_end')[0] != '':
-        qs = qs.filter(last_inspection_date__lte=filter_json.get('last_end')[0])
-
-    if filter_json.get('expiration_start')[0] != '':
-        qs = qs.filter(expiration_date__gte=filter_json.get('expiration_start')[0])
-
-    if filter_json.get('expiration_end')[0] != '':
-        qs = qs.filter(expiration_date__lte=filter_json.get('expiration_end')[0])
-
-    if filter_json.get('type')[0] != 'all':
-        qs = qs.filter(inspection_type__in=filter_json.get('type'))
-
-    if filter_json.get('interval')[0] != 'all':
-        qs = qs.filter(inspection_interval__in=filter_json.get('interval'))
-
-    return qs

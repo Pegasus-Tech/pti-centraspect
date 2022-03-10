@@ -10,67 +10,35 @@ from django.views.generic.edit import UpdateView
 
 from qr_codes.behaviors import QRCodeGeneratorMixin
 from .forms import InspectionItemForm
-from .models import InspectionItem, InspectionItemFilters
+from .models import InspectionItem
+from .filters import InspectionItemsFilters
 from . import service
 
 
 class InspectionItemListView(LoginRequiredMixin, ListView):
+    filter_set = None
     model = InspectionItem
     paginate_by = 10
     template_name = 'dashboard/inspection_items/all_inspection_items.html'
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        self.filter_set = InspectionItemsFilters(self.request.GET, queryset=qs, request=self.request)
+        return service.sort_queryset(qs=self.filter_set.qs, params=self.request.GET)
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super(InspectionItemListView, self).get_context_data(**kwargs)
         acct = self.request.user.account
         query_params = self.request.GET
-        context['sort_col'] = query_params.get('sort_col') if query_params.get('sort_col') else 'inspection_type'
-        context['sort_dir'] = query_params.get('sort_dir') if query_params.get('sort_dir') else 'desc'
+        context['sort_col'] = query_params.get('sort_col') if query_params.get('sort_col') else 'next_inspection_date'
+        context['sort_dir'] = query_params.get('sort_dir') if query_params.get('sort_dir') else 'asc'
         context['types'] = service.get_unique_item_types_for_account(account=acct)
         context['intervals'] = service.get_unique_inspection_intervals_for_account(account=acct)
-
-        filters_qs = InspectionItemFilters.objects.get_queryset().filter(created_by=self.request.user).filter(is_filtering=True)
-        if filters_qs.count() > 0:
-            filters = json.loads(filters_qs.get().filters)
-            context['next_due_start'] = filters.get('next_due_start')[0]
-            context['next_due_end'] = filters.get('next_due_end')[0]
-            context['last_start'] = filters.get('last_start')[0]
-            context['last_end'] = filters.get('last_end')[0]
-            context['expiration_start'] = filters.get('expiration_start')[0]
-            context['expiration_end'] = filters.get('expiration_end')[0]
-            context['type'] = filters.get('type')
-            context['interval'] = filters.get('interval')
-
+        context['filter_form'] = self.filter_set.form
         return context
 
-    def get_queryset(self):
-        req = self.request.GET
-        qs = service.get_all_items_for_account(account=self.request.user.account, params=req)
-        filters_qs = InspectionItemFilters.objects.get_queryset().filter(created_by=self.request.user).filter(is_filtering=True)
-
-        if filters_qs.count() > 0:
-            qs = service.set_filters_on_equipment(filters=filters_qs.first())
-
-        return qs
-
     def post(self, *args, **kwargs):
-        filters = {}
         print(self.request.POST)
-        for k, v in self.request.POST.lists():
-            if k != 'csrfmiddlewaretoken':
-                filters[k] = v
-
-        filter_qs = InspectionItemFilters.objects.filter(created_by=self.request.user)
-
-        if filter_qs.count() <= 0:
-            filter_obj = InspectionItemFilters()
-        else:
-            filter_obj = filter_qs.get()
-
-        filter_obj.filters = json.dumps(filters)
-        filter_obj.is_filtering = True
-        filter_obj.created_by = self.request.user
-
-        filter_obj.save()
         return redirect('inspection_items:list')
 
 

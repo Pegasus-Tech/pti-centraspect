@@ -97,12 +97,6 @@ class InspectionItem(BaseModel):
         return date.today() == self.next_inspection_date
 
 
-class InspectionItemFilters(BaseModel):
-    created_by = models.ForeignKey(User, on_delete=CASCADE, null=False)
-    is_filtering = models.BooleanField(default=False)
-    filters = models.JSONField(null=True, blank=True)
-
-
 @receiver(post_save, sender=InspectionItem)
 def generate_qr_code_callback(sender, instance, created, *args, **kwargs):
     if created:
