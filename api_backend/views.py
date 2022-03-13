@@ -1,26 +1,47 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+
+from authentication.models import User
+from centraspect.utils import upload_image, S3UploadType
 from inspection_items.models import InspectionItem
+from inspection_items.service import get_inspection_by_uuid
 from inspection_forms.models import InspectionForm
 from inspections.mixins import LogInspectionMixin
+from inspections.models import InspectionImage
 from .serializers import InspectionFormSerializer
-from authentication.models import User
 
-from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
 
-# Create your views here.
+
 @csrf_exempt
 def get_form_from_item(request, uuid):
     print(f'got request for uuid: {uuid}')
     if request.method == 'GET':
-        
         item = InspectionForm.objects.get(uuid=uuid)
         serialized = InspectionFormSerializer(item, many=False)
         return JsonResponse(serialized.data, safe=False)
+
+
+@csrf_exempt
+def attach_photos_to_inspection(request, uuid):
+    inspection = get_inspection_by_uuid(uuid)
+    counter = 0
+    if inspection is not None:
+        images = request.FILES.pop('images')
+        for img in images:
+            print(img.temporary_file_path())
+            print(f'account :: {inspection.account.uuid}')
+            image = upload_image(inspection.account, inspection.uuid, S3UploadType.INSPECTION_IMAGE, img)
+            inspection_image = InspectionImage()
+            inspection_image.inspection = inspection
+            inspection_image.image = image
+            inspection_image.save()
+            counter += 1
+
+    return JsonResponse(status=200, data={"Success": f"{counter} image(s) uploaded"})
+
 
 class FormItemAPIView(LogInspectionMixin, APIView):
 
@@ -28,14 +49,14 @@ class FormItemAPIView(LogInspectionMixin, APIView):
         print(f'looking for form :: {uuid}')
         item = InspectionItem.objects.get(uuid=uuid)
         serialized = {
-            "inspection_item_title":item.title,
-            "inspection_item_uuid":item.uuid,
-            "inspection_item_owner":item.assigned_to.get_full_name() if item.assigned_to is not None else None,
-            "inspection_item_owner_uuid":item.assigned_to.uuid if item.assigned_to is not None else None,
-            "inspection_form_title":item.form.title if item.form is not None else None,
-            "inspection_form_uuid":item.form.uuid if item.form is not None else None,
-            "inspection_form":item.form.form_json if item.form is not None else None
-            }
+            "inspection_item_title": item.title,
+            "inspection_item_uuid": item.uuid,
+            "inspection_item_owner": item.assigned_to.get_full_name() if item.assigned_to is not None else None,
+            "inspection_item_owner_uuid": item.assigned_to.uuid if item.assigned_to is not None else None,
+            "inspection_form_title": item.form.title if item.form is not None else None,
+            "inspection_form_uuid": item.form.uuid if item.form is not None else None,
+            "inspection_form": item.form.form_json if item.form is not None else None
+        }
         return Response(serialized)
 
     def post(self, request, uuid):

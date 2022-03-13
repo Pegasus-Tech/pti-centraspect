@@ -1,8 +1,19 @@
 from django.db import models
 from centraspect.models import BaseModel
+from centraspect.utils import build_bucket_path, generate_filename, S3UploadType
 from inspection_forms.models import InspectionForm
 from inspection_items.models import InspectionItem
 from authentication.models import Account, User
+
+
+def qr_directory_path(instance, filename):
+    filename = generate_filename()
+    bucket_path = build_bucket_path(instance.inspection.account,
+                                    instance.uuid,
+                                    S3UploadType.INSPECTION_IMAGE,
+                                    filename=filename)
+    path = f'qr_codes/{bucket_path}'
+    return path
 
 
 class InspectionManager(models.Manager):
@@ -59,3 +70,8 @@ class Inspection(BaseModel):
             "completed_past_due": self.completed_past_due,
             "failed_inspection": self.failed_inspection
         }
+
+
+class InspectionImage(BaseModel):
+    inspection = models.ForeignKey(Inspection, on_delete=models.PROTECT)
+    image = models.ImageField(upload_to=qr_directory_path, max_length=1000, blank=True, null=True)

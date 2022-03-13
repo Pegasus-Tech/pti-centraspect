@@ -1,10 +1,12 @@
 from rest_framework import serializers
 from inspection_forms.models import InspectionForm
 
+
 class InspectionFormSerializer(serializers.ModelSerializer):
     class Meta:
-        model=InspectionForm
-        fields=['title', 'form_json']
+        model = InspectionForm
+        fields = ['title', 'form_json']
+
 
 class FormSerializer(serializers.Serializer):
     item_uuid = serializers.UUIDField()

@@ -12,6 +12,10 @@ def get_all_inspections_for_item(inspection_item) -> QuerySet:
     return qs
 
 
+def get_inspection_by_uuid(uuid) -> Inspection:
+    return Inspection.objects.get(uuid=uuid)
+
+
 def get_completion_rate_for_item(inspection_item) -> int:
     qs = Inspection.objects.filter(item=inspection_item)
     on_time = qs.filter(completed_past_due=False)

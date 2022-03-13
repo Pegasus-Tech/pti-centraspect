@@ -6,15 +6,16 @@ from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
 from authentication.models import User, Account
 from centraspect.models import BaseModel
-from centraspect.utils import generate_qr_code_image, _build_bucket_path
+from centraspect.utils import generate_qr_code_image, build_bucket_path, S3UploadType
 from inspection_forms.models import InspectionForm
 from datetime import date
 from .utils import serialize_inspection_item
 
 
-def qr_directory_path(instance, filename):
-    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-    return f'qr_codes/{_build_bucket_path(instance.account, instance.uuid)}'
+def qr_directory_path(instance):
+    path = f'qr_codes/{build_bucket_path(instance.account, instance.uuid, S3UploadType.QR_CODE)}'
+    print("UPLOAD PATH == " + path)
+    return path
 
 
 class InspectionItemManager(models.Manager):
