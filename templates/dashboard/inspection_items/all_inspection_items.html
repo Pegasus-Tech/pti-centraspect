@@ -5,323 +5,323 @@
 {% render_bundle 'equipment' %}
 
 {% block body %}
-    <div id="equipment-root"></div>
+{#    <div id="equipment-root"></div>#}
 
-{#    <h1 class="uk-margin-top">Manage Inspection Equipment</h1>#}
-{#    <hr class="uk-divider-icon"/>#}
-{#    <ul uk-accordion>#}
-{#            <li >#}
-{#                <a class="uk-accordion-title" href="#">Filters</a>#}
-{#                <div class="uk-accordion-content">#}
-{#                    <form method="get">#}
-{#                        <div uk-grid>#}
-{#                            <div class="uk-width-1-3">#}
-{#                                <label for="">Next Due Date Range</label>#}
-{#                                <div class="uk-form-stacked">#}
-{#                                    <label class="uk-form-label">Start Date</label>#}
-{#                                    <div class="uk-form-controls">#}
-{#                                        {% if next_due_start %}#}
-{#                                            <input class="uk-input" type="date" name="due_date_start" value="{{ next_due_start }}"/>#}
-{#                                        {% else %}#}
-{#                                            <input class="uk-input" type="date" name="due_date_start"/>#}
-{#                                        {% endif %}#}
-{#                                    </div>#}
-{#                                    <label class="uk-form-label">End Date</label>#}
-{#                                    <div class="uk-form-controls">#}
-{#                                        {% if next_due_end %}#}
-{#                                            <input class="uk-input" type="date" name="due_date_end" value="{{ next_due_end }}"/>#}
-{#                                        {% else %}#}
-{#                                            <input class="uk-input" type="date" name="due_date_end"/>#}
-{#                                        {% endif %}#}
-{#                                    </div>#}
-{#                                </div>#}
-{##}
-{#                            </div>#}
-{##}
-{#                            <div class="uk-width-1-3">#}
-{#                                <label for="">Last Inspection Date Range</label>#}
-{#                                <div class="uk-form-stacked">#}
-{#                                    <label class="uk-form-label">Start Date</label>#}
-{#                                    <div class="uk-form-controls">#}
-{#                                        {% if last_start %}#}
-{#                                            <input class="uk-input" type="date" name="last_date_start" value="{{ last_start }}"/>#}
-{#                                        {% else %}#}
-{#                                            <input class="uk-input" type="date" name="last_date_start"/>#}
-{#                                        {% endif %}#}
-{##}
-{#                                    </div>#}
-{#                                    <label class="uk-form-label">End Date</label>#}
-{#                                    <div class="uk-form-controls">#}
-{#                                        {% if last_end %}#}
-{#                                            <input class="uk-input" type="date" name="last_date_end" value="{{ last_end }}"/>#}
-{#                                        {% else %}#}
-{#                                            <input class="uk-input" type="date" name="last_date_end"/>#}
-{#                                        {% endif %}#}
-{#                                    </div>#}
-{#                                </div>#}
-{##}
-{#                            </div>#}
-{##}
-{#                            <div class="uk-width-1-3">#}
-{#                                <label for="">Expiration Date Range</label>#}
-{#                                <div class="uk-form-stacked">#}
-{#                                    <label class="uk-form-label">Start Date</label>#}
-{#                                    <div class="uk-form-controls">#}
-{#                                        {% if expiration_start %}#}
-{#                                            <input class="uk-input" type="date" name="expiration_start" value="{{ expiration_start }}"/>#}
-{#                                        {% else %}#}
-{#                                            <input class="uk-input" type="date" name="expiration_start"/>#}
-{#                                        {% endif %}#}
-{##}
-{#                                    </div>#}
-{#                                    <label class="uk-form-label">End Date</label>#}
-{#                                    <div class="uk-form-controls">#}
-{#                                        {% if expiration_end %}#}
-{#                                            <input class="uk-input" type="date" name="expiration_end" value="{{ expiration_end }}"/>#}
-{#                                        {% else %}#}
-{#                                            <input class="uk-input" type="date" name="expiration_end"/>#}
-{#                                        {% endif %}#}
-{##}
-{#                                    </div>#}
-{#                                </div>#}
-{#                            </div>#}
-{#                            <div class="uk-width-1-2">#}
-{#                                <label>Inspection Type</label>#}
-{#                                <select class="uk-select" name="inspection_type">#}
-{#                                    <option value="all">All</option>#}
-{#                                    {% for t in types %}#}
-{#                                        {% if t in type %}#}
-{#                                            <option value="{{ t|lower }}" selected>{{ t|upper }}</option>#}
-{#                                        {% else %}#}
-{#                                            <option value="{{ t|lower }}">{{ t|upper }}</option>#}
-{#                                        {% endif %}#}
-{#                                    {% endfor %}#}
-{#                                </select>#}
-{#                            </div>#}
-{#                            <div class="uk-width-1-2">#}
-{#                                <label>Inspection Interval</label>#}
-{#                                <select class="uk-select" name="inspection_interval">#}
-{#                                    <option value="all">All</option>#}
-{#                                    {% for i in intervals %}#}
-{#                                        {% if i in interval %}#}
-{#                                            <option value="{{ i|lower }}" selected>{{ i|upper }}</option>#}
-{#                                        {% else %}#}
-{#                                            <option value="{{ i|lower }}">{{ i|upper }}</option>#}
-{#                                        {% endif %}#}
-{#                                    {% endfor %}#}
-{#                                </select>#}
-{#                            </div>#}
-{##}
-{#                        </div>#}
-{#                        <button class="uk-button uk-button-primary uk-margin-medium-top" type="submit">Apply Filters</button>#}
-{#                        <a href="{% url 'inspection_items:clear_filters' %}" class="uk-button uk-button-secondary uk-margin-medium-top uk-margin-left" type="button">Clear Filters</a>#}
-{#                    </form>#}
-{#                </div>#}
-{#            </li>#}
-{#        </ul>#}
-{#    {% if inspectionitem_list|length > 0 %}#}
-{#        <table class="uk-table uk-table-striped">#}
-{#            <thead>#}
-{#            <tr>#}
-{#                <th>#}
-{#                    {% if sort_col == 'title' %}#}
-{#                        {% if sort_dir == 'asc' %}#}
-{#                            <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=title&sort_dir=desc'}}" uk-icon="arrow-up">Title</a>#}
-{#                        {% else %}#}
-{#                            <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=title&sort_dir=asc'}}" uk-icon="arrow-down">Title</a>#}
-{#                        {% endif %}#}
-{#                    {% else %}#}
-{#                        <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=title&sort_dir=desc'}}">Title</a>#}
-{#                    {% endif %}#}
-{#                </th>#}
-{#                <th>#}
-{#                    {% if sort_col == 'inspection_type' %}#}
-{#                        {% if sort_dir == 'asc' %}#}
-{#                            <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=inspection_type&sort_dir=desc'}}" uk-icon="arrow-up">Type</a>#}
-{#                        {% else %}#}
-{#                            <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=inspection_type&sort_dir=asc'}}" uk-icon="arrow-down">Type</a>#}
-{#                        {% endif %}#}
-{#                    {% else %}#}
-{#                        <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=inspection_type&sort_dir=desc'}}">Type</a>#}
-{#                    {% endif %}#}
-{#                </th>#}
-{#                <th>#}
-{#                    {% if sort_col == 'last_inspection_date' %}#}
-{#                        {% if sort_dir == 'asc' %}#}
-{#                            <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=last_inspection_date&sort_dir=desc'}}" uk-icon="arrow-up">Last Inspection Date</a>#}
-{#                        {% else %}#}
-{#                            <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=last_inspection_date&sort_dir=asc'}}" uk-icon="arrow-down">Last Inspection Date</a>#}
-{#                        {% endif %}#}
-{#                    {% else %}#}
-{#                        <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=last_inspection_date&sort_dir=desc'}}">Last Inspection Date</a>#}
-{#                    {% endif %}#}
-{#                </th>#}
-{#                <th>#}
-{#                    {% if sort_col == 'next_inspection_date' %}#}
-{#                        {% if sort_dir == 'asc' %}#}
-{#                            <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=next_inspection_date&sort_dir=desc' }}" uk-icon="arrow-up">Next Inspection Date</a>#}
-{#                        {% else %}#}
-{#                            <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=next_inspection_date&sort_dir=asc' }}" uk-icon="arrow-down">Next Inspection Date</a>#}
-{#                        {% endif %}#}
-{#                    {% else %}#}
-{#                        <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=next_inspection_date&sort_dir=desc' }}">Next Inspection Date</a>#}
-{#                    {% endif %}#}
-{#                </th>#}
-{#                <th>#}
-{#                    {% if sort_col == 'expiration_date' %}#}
-{#                        {% if sort_dir == 'asc' %}#}
-{#                            <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=expiration_date&sort_dir=desc'}}" uk-icon="arrow-up">Expiration Date</a>#}
-{#                        {% else %}#}
-{#                            <a  class="uk-link-text"href="{{ request.get_full_path|append_to_path:'sort_col=expiration_date&sort_dir=asc'}}" uk-icon="arrow-down">Expiration Date</a>#}
-{#                        {% endif %}#}
-{#                    {% else %}#}
-{#                        <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=expiration_date&sort_dir=desc'}}">Expiration Date</a>#}
-{#                    {% endif %}#}
-{#                </th>#}
-{#                <th>#}
-{#                    {% if sort_col == 'inspection_interval' %}#}
-{#                        {% if sort_dir == 'asc' %}#}
-{#                            <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=inspection_interval&sort_dir=desc' }}" uk-icon="arrow-up">Interval</a>#}
-{#                        {% else %}#}
-{#                            <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=inspection_interval&sort_dir=asc' }}" uk-icon="arrow-down">Interval</a>#}
-{#                        {% endif %}#}
-{#                    {% else %}#}
-{#                        <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=inspection_interval&sort_dir=desc' }}">Interval</a>#}
-{#                    {% endif %}#}
-{#                </th>#}
-{#                <th>QR Code</th>#}
-{#                <th>Actions</th>#}
-{#            </tr>#}
-{#            </thead>#}
-{#            <tbody>#}
-{#            {% for item in inspectionitem_list %}#}
-{#                <tr>#}
-{#                    <td class="uk-text-bolder">#}
-{#                        <a class="uk-link-text" href="{{ item.get_absolute_url }}">{{ item.title|capfirst }}</a>#}
-{#                    </td>#}
-{##}
-{#                    {% if item.inspection_type == 'rescue' %}#}
-{#                        <td>#}
-{#                            <div class="uk-label centra-label-primary">{{ item.inspection_type|upper }}</div>#}
-{#                        </td>#}
-{#                    {% elif  item.inspection_type == 'first aid' %}#}
-{#                        <td>#}
-{#                            <div class="uk-label centra-label-red">{{ item.inspection_type|upper }}</div>#}
-{#                        </td>#}
-{#                    {% elif  item.inspection_type == 'ppe' %}#}
-{#                        <td>#}
-{#                            <div class="uk-label centra-label-green">{{ item.inspection_type|upper }}</div>#}
-{#                        </td>#}
-{#                    {% elif  item.inspection_type == 'facility' %}#}
-{#                        <td>#}
-{#                            <div class="uk-label centra-label-orange">{{ item.inspection_type|upper }}</div>#}
-{#                        </td>#}
-{#                    {% elif  item.inspection_type == 'equipment' %}#}
-{#                        <td>#}
-{#                            <div class="uk-label centra-label-yellow">{{ item.inspection_type|upper }}</div>#}
-{#                        </td>#}
-{#                    {% elif  item.inspection_type == 'vehicle' %}#}
-{#                        <td>#}
-{#                            <div class="uk-label centra-label-purple">{{ item.inspection_type|upper }}</div>#}
-{#                        </td>#}
-{#                    {% elif  item.inspection_type == 'other' %}#}
-{#                        <td>#}
-{#                            <div class="uk-label centra-label-grey">{{ item.inspection_type|upper }}</div>#}
-{#                        </td>#}
-{#                    {% endif %}#}
-{#                    <td>{{ item.last_inspection_date|default_if_none:"--" }}</td>#}
-{#                    <td>{{ item.next_inspection_date }}</td>#}
-{#                    <td>{{ item.expiration_date|default_if_none:"--" }}</td>#}
-{#                    <td>{{ item.inspection_interval|capfirst }}</td>#}
-{#                    <td align="center">#}
-{#                        <a href="#qr-modal-{{ item.uuid }}" uk-toggle uk-tooltip="View QR Code">#}
-{#                            <img class="uk-icon-image" src="{% static '/images/qr_icon.png' %}"/>#}
-{#                        </a>#}
-{#                    </td>#}
-{#                    <td>#}
-{#                        <a href="{{ item.get_absolute_url }}" uk-icon="icon: desktop" uk-tooltip="View"></a>#}
-{#                        <a href="{% url 'inspection_items:update' uuid=item.uuid %}" uk-icon="icon: pencil"#}
-{#                           uk-tooltip="Edit"></a>#}
-{#                        <a href="#delete-confirmation-{{ item.uuid }}" uk-toggle uk-icon="icon: ban"#}
-{#                           uk-tooltip="Delete"></a>#}
-{#                    </td>#}
-{#                </tr>#}
-{##}
-{#                <div id="qr-modal-{{ item.uuid }}" class="uk-flex-top" uk-modal>#}
-{#                    <div class="uk-modal-dialog uk-margin-auto-vertical">#}
-{#                        <div>#}
-{#                            {% if item.qr_code %}#}
-{#                                <img src="{{ item.qr_code.url|default_if_none:"#" }}" alt="QR Code"/>#}
-{#                            {% endif %}#}
-{##}
-{#                        </div>#}
-{#                    </div>#}
-{#                </div>#}
-{##}
-{#                <div id="delete-confirmation-{{ item.uuid }}" uk-modal>#}
-{#                    <div class="uk-modal-dialog">#}
-{#                        <form action="{% url 'inspection_items:delete' uuid=item.uuid %}" method="get">#}
-{#                            <div class="uk-modal-header">#}
-{#                                <h2 class="uk-modal-title">Are you sure?</h2>#}
-{#                            </div>#}
-{#                            <div class="uk-modal-body">#}
-{#                                <p>Are you sure you want to delete equipment: "{{ item.title }}"?</p>#}
-{#                            </div>#}
-{#                            <div class="uk-modal-footer">#}
-{#                                <button class="uk-modal-close uk-button uk-button-danger" type="button">Cancel</button>#}
-{#                                <button class="uk-button uk-button-primary" type="submit">Confirm Delete</button>#}
-{#                            </div>#}
-{#                        </form>#}
-{#                    </div>#}
-{#                </div>#}
-{#            {% endfor %}#}
-{#            </tbody>#}
-{#        </table>#}
-{#        {% if is_paginated %}#}
-{#            <ul class="uk-pagination">#}
-{#                {% if page_obj.has_previous %}#}
-{#                    <li>#}
-{#                        <a href="{{ request.get_full_path|replace_or_insert_page:page_obj.previous_page_number }}">#}
-{#                            <span uk-pagination-previous></span>#}
-{#                        </a>#}
-{#                    </li>#}
-{#                {% else %}#}
-{#                    <li class="uk-disabled"><a href="#"><span uk-pagination-previous></span></a></li>#}
-{#                {% endif %}#}
-{#                {% for i in paginator.page_range %}#}
-{#                    {% if page_obj.number == i %}#}
-{#                        <li class="uk-active"><span>{{ i }}</span></li>#}
-{#                    {% else %}#}
-{#                        <li><a href="{{ request.get_full_path|replace_or_insert_page:i }}">{{ i }}</a></li>#}
-{#                    {% endif %}#}
-{#                {% endfor %}#}
-{#                {% if page_obj.has_next %}#}
-{#                    <li>#}
-{#                        <a  href="{{ request.get_full_path|replace_or_insert_page:page_obj.next_page_number }}">#}
-{#                            <span uk-pagination-next></span>#}
-{#                        </a>#}
-{#                    </li>#}
-{#                {% else %}#}
-{#                    <li class="uk-disabled"><a href="#"><span uk-pagination-next></span></a></li>#}
-{#                {% endif %}#}
-{#            </ul>#}
-{#        {% endif %}#}
-{##}
-{#    {% else %}#}
-{#        <div class="uk-container">#}
-{#            <div>#}
-{#                <div class="uk-card uk-card-primary uk-card-body">#}
-{#                    <h3 class="uk-card-title">No Inspection Equipment Yet...</h3>#}
-{#                    <p>If you haven't created an Inpsection Form yet, we suggest you start there so you can assign the#}
-{#                        inpsection forms to your equipment to be inspected.<br/> Use the <a#}
-{#                                href="{% url 'inspection_forms:form_builder' %}">Form Builder</a> to build your first#}
-{#                        custom form</p>#}
-{#                    <p>If you have creatd your first form, <a href="{% url 'inspection_items:create' %}">Create Your#}
-{#                        First Inspection Equipment</a> to get started!</p>#}
-{#                </div>#}
-{#            </div>#}
-{#        </div>#}
-{#    {% endif %}#}
+    <h1 class="uk-margin-top">Manage Inspection Equipment</h1>
+    <hr class="uk-divider-icon"/>
+    <ul uk-accordion>
+            <li >
+                <a class="uk-accordion-title" href="#">Filters</a>
+                <div class="uk-accordion-content">
+                    <form method="get">
+                        <div uk-grid>
+                            <div class="uk-width-1-3">
+                                <label for="">Next Due Date Range</label>
+                                <div class="uk-form-stacked">
+                                    <label class="uk-form-label">Start Date</label>
+                                    <div class="uk-form-controls">
+                                        {% if next_due_start %}
+                                            <input class="uk-input" type="date" name="due_date_start" value="{{ next_due_start }}"/>
+                                        {% else %}
+                                            <input class="uk-input" type="date" name="due_date_start"/>
+                                        {% endif %}
+                                    </div>
+                                    <label class="uk-form-label">End Date</label>
+                                    <div class="uk-form-controls">
+                                        {% if next_due_end %}
+                                            <input class="uk-input" type="date" name="due_date_end" value="{{ next_due_end }}"/>
+                                        {% else %}
+                                            <input class="uk-input" type="date" name="due_date_end"/>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="uk-width-1-3">
+                                <label for="">Last Inspection Date Range</label>
+                                <div class="uk-form-stacked">
+                                    <label class="uk-form-label">Start Date</label>
+                                    <div class="uk-form-controls">
+                                        {% if last_start %}
+                                            <input class="uk-input" type="date" name="last_date_start" value="{{ last_start }}"/>
+                                        {% else %}
+                                            <input class="uk-input" type="date" name="last_date_start"/>
+                                        {% endif %}
+
+                                    </div>
+                                    <label class="uk-form-label">End Date</label>
+                                    <div class="uk-form-controls">
+                                        {% if last_end %}
+                                            <input class="uk-input" type="date" name="last_date_end" value="{{ last_end }}"/>
+                                        {% else %}
+                                            <input class="uk-input" type="date" name="last_date_end"/>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="uk-width-1-3">
+                                <label for="">Expiration Date Range</label>
+                                <div class="uk-form-stacked">
+                                    <label class="uk-form-label">Start Date</label>
+                                    <div class="uk-form-controls">
+                                        {% if expiration_start %}
+                                            <input class="uk-input" type="date" name="expiration_start" value="{{ expiration_start }}"/>
+                                        {% else %}
+                                            <input class="uk-input" type="date" name="expiration_start"/>
+                                        {% endif %}
+
+                                    </div>
+                                    <label class="uk-form-label">End Date</label>
+                                    <div class="uk-form-controls">
+                                        {% if expiration_end %}
+                                            <input class="uk-input" type="date" name="expiration_end" value="{{ expiration_end }}"/>
+                                        {% else %}
+                                            <input class="uk-input" type="date" name="expiration_end"/>
+                                        {% endif %}
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="uk-width-1-2">
+                                <label>Inspection Type</label>
+                                <select class="uk-select" name="inspection_type">
+                                    <option value="all">All</option>
+                                    {% for t in types %}
+                                        {% if t in type %}
+                                            <option value="{{ t|lower }}" selected>{{ t|upper }}</option>
+                                        {% else %}
+                                            <option value="{{ t|lower }}">{{ t|upper }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="uk-width-1-2">
+                                <label>Inspection Interval</label>
+                                <select class="uk-select" name="inspection_interval">
+                                    <option value="all">All</option>
+                                    {% for i in intervals %}
+                                        {% if i in interval %}
+                                            <option value="{{ i|lower }}" selected>{{ i|upper }}</option>
+                                        {% else %}
+                                            <option value="{{ i|lower }}">{{ i|upper }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                        </div>
+                        <button class="uk-button uk-button-primary uk-margin-medium-top" type="submit">Apply Filters</button>
+                        <a href="{% url 'inspection_items:clear_filters' %}" class="uk-button uk-button-secondary uk-margin-medium-top uk-margin-left" type="button">Clear Filters</a>
+                    </form>
+                </div>
+            </li>
+        </ul>
+    {% if inspectionitem_list|length > 0 %}
+        <table class="uk-table uk-table-striped">
+            <thead>
+            <tr>
+                <th>
+                    {% if sort_col == 'title' %}
+                        {% if sort_dir == 'asc' %}
+                            <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=title&sort_dir=desc'}}" uk-icon="arrow-up">Title</a>
+                        {% else %}
+                            <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=title&sort_dir=asc'}}" uk-icon="arrow-down">Title</a>
+                        {% endif %}
+                    {% else %}
+                        <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=title&sort_dir=desc'}}">Title</a>
+                    {% endif %}
+                </th>
+                <th>
+                    {% if sort_col == 'inspection_type' %}
+                        {% if sort_dir == 'asc' %}
+                            <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=inspection_type&sort_dir=desc'}}" uk-icon="arrow-up">Type</a>
+                        {% else %}
+                            <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=inspection_type&sort_dir=asc'}}" uk-icon="arrow-down">Type</a>
+                        {% endif %}
+                    {% else %}
+                        <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=inspection_type&sort_dir=desc'}}">Type</a>
+                    {% endif %}
+                </th>
+                <th>
+                    {% if sort_col == 'last_inspection_date' %}
+                        {% if sort_dir == 'asc' %}
+                            <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=last_inspection_date&sort_dir=desc'}}" uk-icon="arrow-up">Last Inspection Date</a>
+                        {% else %}
+                            <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=last_inspection_date&sort_dir=asc'}}" uk-icon="arrow-down">Last Inspection Date</a>
+                        {% endif %}
+                    {% else %}
+                        <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=last_inspection_date&sort_dir=desc'}}">Last Inspection Date</a>
+                    {% endif %}
+                </th>
+                <th>
+                    {% if sort_col == 'next_inspection_date' %}
+                        {% if sort_dir == 'asc' %}
+                            <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=next_inspection_date&sort_dir=desc' }}" uk-icon="arrow-up">Next Inspection Date</a>
+                        {% else %}
+                            <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=next_inspection_date&sort_dir=asc' }}" uk-icon="arrow-down">Next Inspection Date</a>
+                        {% endif %}
+                    {% else %}
+                        <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=next_inspection_date&sort_dir=desc' }}">Next Inspection Date</a>
+                    {% endif %}
+                </th>
+                <th>
+                    {% if sort_col == 'expiration_date' %}
+                        {% if sort_dir == 'asc' %}
+                            <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=expiration_date&sort_dir=desc'}}" uk-icon="arrow-up">Expiration Date</a>
+                        {% else %}
+                            <a  class="uk-link-text"href="{{ request.get_full_path|append_to_path:'sort_col=expiration_date&sort_dir=asc'}}" uk-icon="arrow-down">Expiration Date</a>
+                        {% endif %}
+                    {% else %}
+                        <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=expiration_date&sort_dir=desc'}}">Expiration Date</a>
+                    {% endif %}
+                </th>
+                <th>
+                    {% if sort_col == 'inspection_interval' %}
+                        {% if sort_dir == 'asc' %}
+                            <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=inspection_interval&sort_dir=desc' }}" uk-icon="arrow-up">Interval</a>
+                        {% else %}
+                            <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=inspection_interval&sort_dir=asc' }}" uk-icon="arrow-down">Interval</a>
+                        {% endif %}
+                    {% else %}
+                        <a class="uk-link-text" href="{{ request.get_full_path|append_to_path:'sort_col=inspection_interval&sort_dir=desc' }}">Interval</a>
+                    {% endif %}
+                </th>
+                <th>QR Code</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in inspectionitem_list %}
+                <tr>
+                    <td class="uk-text-bolder">
+                        <a class="uk-link-text" href="{{ item.get_absolute_url }}">{{ item.title|capfirst }}</a>
+                    </td>
+
+                    {% if item.inspection_type == 'rescue' %}
+                        <td>
+                            <div class="uk-label centra-label-primary">{{ item.inspection_type|upper }}</div>
+                        </td>
+                    {% elif  item.inspection_type == 'first aid' %}
+                        <td>
+                            <div class="uk-label centra-label-red">{{ item.inspection_type|upper }}</div>
+                        </td>
+                    {% elif  item.inspection_type == 'ppe' %}
+                        <td>
+                            <div class="uk-label centra-label-green">{{ item.inspection_type|upper }}</div>
+                        </td>
+                    {% elif  item.inspection_type == 'facility' %}
+                        <td>
+                            <div class="uk-label centra-label-orange">{{ item.inspection_type|upper }}</div>
+                        </td>
+                    {% elif  item.inspection_type == 'equipment' %}
+                        <td>
+                            <div class="uk-label centra-label-yellow">{{ item.inspection_type|upper }}</div>
+                        </td>
+                    {% elif  item.inspection_type == 'vehicle' %}
+                        <td>
+                            <div class="uk-label centra-label-purple">{{ item.inspection_type|upper }}</div>
+                        </td>
+                    {% elif  item.inspection_type == 'other' %}
+                        <td>
+                            <div class="uk-label centra-label-grey">{{ item.inspection_type|upper }}</div>
+                        </td>
+                    {% endif %}
+                    <td>{{ item.last_inspection_date|default_if_none:"--" }}</td>
+                    <td>{{ item.next_inspection_date }}</td>
+                    <td>{{ item.expiration_date|default_if_none:"--" }}</td>
+                    <td>{{ item.inspection_interval|capfirst }}</td>
+                    <td align="center">
+                        <a href="#qr-modal-{{ item.uuid }}" uk-toggle uk-tooltip="View QR Code">
+                            <img class="uk-icon-image" src="{% static '/images/qr_icon.png' %}"/>
+                        </a>
+                    </td>
+                    <td>
+                        <a href="{{ item.get_absolute_url }}" uk-icon="icon: desktop" uk-tooltip="View"></a>
+                        <a href="{% url 'inspection_items:update' uuid=item.uuid %}" uk-icon="icon: pencil"
+                           uk-tooltip="Edit"></a>
+                        <a href="#delete-confirmation-{{ item.uuid }}" uk-toggle uk-icon="icon: ban"
+                           uk-tooltip="Delete"></a>
+                    </td>
+                </tr>
+
+                <div id="qr-modal-{{ item.uuid }}" class="uk-flex-top" uk-modal>
+                    <div class="uk-modal-dialog uk-margin-auto-vertical">
+                        <div>
+                            {% if item.qr_code %}
+                                <img src="{{ item.qr_code.url|default_if_none:"#" }}" alt="QR Code"/>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+
+                <div id="delete-confirmation-{{ item.uuid }}" uk-modal>
+                    <div class="uk-modal-dialog">
+                        <form action="{% url 'inspection_items:delete' uuid=item.uuid %}" method="get">
+                            <div class="uk-modal-header">
+                                <h2 class="uk-modal-title">Are you sure?</h2>
+                            </div>
+                            <div class="uk-modal-body">
+                                <p>Are you sure you want to delete equipment: "{{ item.title }}"?</p>
+                            </div>
+                            <div class="uk-modal-footer">
+                                <button class="uk-modal-close uk-button uk-button-danger" type="button">Cancel</button>
+                                <button class="uk-button uk-button-primary" type="submit">Confirm Delete</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% if is_paginated %}
+            <ul class="uk-pagination">
+                {% if page_obj.has_previous %}
+                    <li>
+                        <a href="{{ request.get_full_path|replace_or_insert_page:page_obj.previous_page_number }}">
+                            <span uk-pagination-previous></span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="uk-disabled"><a href="#"><span uk-pagination-previous></span></a></li>
+                {% endif %}
+                {% for i in paginator.page_range %}
+                    {% if page_obj.number == i %}
+                        <li class="uk-active"><span>{{ i }}</span></li>
+                    {% else %}
+                        <li><a href="{{ request.get_full_path|replace_or_insert_page:i }}">{{ i }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}
+                    <li>
+                        <a  href="{{ request.get_full_path|replace_or_insert_page:page_obj.next_page_number }}">
+                            <span uk-pagination-next></span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="uk-disabled"><a href="#"><span uk-pagination-next></span></a></li>
+                {% endif %}
+            </ul>
+        {% endif %}
+
+    {% else %}
+        <div class="uk-container">
+            <div>
+                <div class="uk-card uk-card-primary uk-card-body">
+                    <h3 class="uk-card-title">No Inspection Equipment Yet...</h3>
+                    <p>If you haven't created an Inpsection Form yet, we suggest you start there so you can assign the
+                        inpsection forms to your equipment to be inspected.<br/> Use the <a
+                                href="{% url 'inspection_forms:form_builder' %}">Form Builder</a> to build your first
+                        custom form</p>
+                    <p>If you have creatd your first form, <a href="{% url 'inspection_items:create' %}">Create Your
+                        First Inspection Equipment</a> to get started!</p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 {% endblock body %}
 {% block added_js %}
 

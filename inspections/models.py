@@ -1,18 +1,16 @@
 from django.db import models
 from centraspect.models import BaseModel
-from centraspect.utils import build_bucket_path, generate_filename, S3UploadType
+from centraspect.utils import S3UploadType, S3UploadUtils
 from inspection_forms.models import InspectionForm
 from inspection_items.models import InspectionItem
 from authentication.models import Account, User
 
 
 def qr_directory_path(instance, filename):
-    filename = generate_filename()
-    bucket_path = build_bucket_path(instance.inspection.account,
-                                    instance.uuid,
-                                    S3UploadType.INSPECTION_IMAGE,
-                                    filename=filename)
-    path = f'qr_codes/{bucket_path}'
+    bucket_path = S3UploadUtils.build_upload_to_path(instance.inspection.account,
+                                                instance.inspection.uuid,
+                                                S3UploadType.INSPECTION_IMAGE,)
+    path = f'inspections/{bucket_path}/{filename}'
     return path
 
 

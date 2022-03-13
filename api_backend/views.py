@@ -1,18 +1,16 @@
-from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
+from .serializers import InspectionFormSerializer
 from authentication.models import User
-from centraspect.utils import upload_image, S3UploadType
-from inspection_items.models import InspectionItem
-from inspection_items.service import get_inspection_by_uuid
+from centraspect.utils import S3UploadType, S3UploadUtils
 from inspection_forms.models import InspectionForm
+from inspection_items import service as inspection_item_service
+from inspection_items.models import InspectionItem
 from inspections.mixins import LogInspectionMixin
 from inspections.models import InspectionImage
-from .serializers import InspectionFormSerializer
-
-from rest_framework.views import APIView
-from rest_framework.response import Response
 
 
 @csrf_exempt
@@ -26,21 +24,32 @@ def get_form_from_item(request, uuid):
 
 @csrf_exempt
 def attach_photos_to_inspection(request, uuid):
-    inspection = get_inspection_by_uuid(uuid)
+    inspection = inspection_item_service.get_inspection_by_uuid(uuid)
     counter = 0
     if inspection is not None:
-        images = request.FILES.pop('images')
-        for img in images:
-            print(img.temporary_file_path())
-            print(f'account :: {inspection.account.uuid}')
-            image = upload_image(inspection.account, inspection.uuid, S3UploadType.INSPECTION_IMAGE, img)
-            inspection_image = InspectionImage()
-            inspection_image.inspection = inspection
-            inspection_image.image = image
-            inspection_image.save()
-            counter += 1
+        has_images = request.FILES.get('images') is not None
+        if has_images:
+            images = request.FILES.pop('images')
+            for img in images:
+                try:
+                    image = S3UploadUtils.upload_image(inspection.account,
+                                                       inspection.uuid,
+                                                       S3UploadType.INSPECTION_IMAGE,
+                                                       img)
 
-    return JsonResponse(status=200, data={"Success": f"{counter} image(s) uploaded"})
+                    inspection_image = InspectionImage()
+                    inspection_image.inspection = inspection
+                    inspection_image.image = image
+                    inspection_image.save()
+                    counter += 1
+                except Exception as e:
+                    return JsonResponse(status=400, data={"Error": e})
+
+            return JsonResponse(status=200, data={"Success": f"{counter} image(s) uploaded"})
+        return JsonResponse(status=422,
+                            data={"Message": "No Images Uploaded. Make sure the request files are set to key 'images'"})
+    else:
+        return JsonResponse(status=400, data={"Error", f"Inspection {uuid} not found."})
 
 
 class FormItemAPIView(LogInspectionMixin, APIView):
@@ -71,14 +80,13 @@ class FormItemAPIView(LogInspectionMixin, APIView):
             disposition = data['disposition']
         except KeyError:
             print(f'No disposition attached to request')
+            return JsonResponse(data={"Error": "No disposition attached to request"}, status=400)
         finally:
-            print(f'Disposition = {disposition}')
             inspection = self.log_inspection(inspection_item=item,
                                              logged_by=user,
                                              completed_form=data['inspection_form_filled'],
                                              inspection_disposition=disposition or 'pass')
             if inspection.get('success'):
-                print(f"SUCCESS :: {inspection.get('inspection')}")
                 inspection_log = inspection.get('inspection')
                 item = self.update_inspection_item_due_dates(inspection=inspection.get('inspection'))
                 resp = {'url': f'/dashboard/inspection-items/{item.uuid}', "inspection_log": inspection_log.to_json()}

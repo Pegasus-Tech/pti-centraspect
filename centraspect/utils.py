@@ -1,12 +1,16 @@
 import random
 import string
-from enum import Enum
-
-from django.utils.text import slugify
-from django.core.files.uploadedfile import InMemoryUploadedFile
-from io import BytesIO
-from PIL import Image
 import qrcode
+
+from enum import Enum
+from io import BytesIO
+
+from django.core.files import File
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.utils.text import slugify
+from PIL import Image
+
+from centraspect.settings import MAX_IMAGE_SIZE
 
 
 class S3UploadType(Enum):
@@ -14,65 +18,86 @@ class S3UploadType(Enum):
     INSPECTION_IMAGE = 'inspections'
 
 
-def generate_qr_code_image(account, instance_uuid, serialized_data):
-    qr = qrcode.QRCode(version=1, box_size=10, border=5)
+class S3UploadUtils:
 
-    qr.add_data(serialized_data)
-    qr.make(fit=True)
+    @staticmethod
+    def build_upload_to_path(account, uuid, upload_type):
+        path = ''
+        base_path = f'{slugify(account.name)}-{account.uuid}/'
 
-    img = qr.make_image(fill='black', back_color='white')
+        if upload_type == S3UploadType.QR_CODE:
+            path = f'{base_path}{upload_type.value}'
 
-    image = BytesIO()
-    img.save(image)
+        elif upload_type == S3UploadType.INSPECTION_IMAGE:
+            path = f"{base_path}{upload_type.value}/inspection-{uuid}"
 
-    file_buffer = upload_image(account=account,
-                               instance_uuid=instance_uuid,
-                               upload_type=S3UploadType.QR_CODE,
-                               image=image)
+        else:
+            raise ValueError(f"Invalid S3UploadType ({upload_type}) provided.")
 
-    return file_buffer
+        return path
 
+    @staticmethod
+    def generate_qr_code_image(account, instance_uuid, serialized_data):
+        qr = qrcode.QRCode(version=1, box_size=10, border=5)
 
-def build_bucket_path(account, instance_uuid, upload_type, **kwargs):
-    path = ''
-    base_path = f'{slugify(account.name)}-{account.uuid}/'
-    if upload_type == S3UploadType.QR_CODE:
-        path = f'{base_path}{upload_type.value}/item-{instance_uuid}.png'
+        qr.add_data(serialized_data)
+        qr.make(fit=True)
 
-    elif upload_type == S3UploadType.INSPECTION_IMAGE:
-        path = f"{base_path}{upload_type.value}/inspection-{instance_uuid}/{kwargs.pop('filename')}.png"
+        img = qr.make_image(fill='black', back_color='white')
 
-    else:
-        raise ValueError(f"Invalid S3UploadType ({upload_type}) provided.")
+        image = BytesIO()
+        img.save(image)
 
-    return path
+        file_buffer = S3UploadUtils.upload_image(account=account,
+                                   instance_uuid=instance_uuid,
+                                   upload_type=S3UploadType.QR_CODE,
+                                   image=image)
 
+        return file_buffer
 
-def generate_filename():
-    return ''.join(random.choices(string.ascii_lowercase + string.ascii_uppercase + string.digits, k=21))
+    @staticmethod
+    def build_bucket_path(account, instance_uuid, upload_type, **kwargs):
+        path = ''
+        base_path = f'{slugify(account.name)}-{account.uuid}/'
+        if upload_type == S3UploadType.QR_CODE:
+            path = f'{base_path}{upload_type.value}/item-{instance_uuid}.png'
 
+        elif upload_type == S3UploadType.INSPECTION_IMAGE:
+            path = f"{base_path}{upload_type.value}/inspection-{instance_uuid}/{kwargs.pop('filename')}"
 
-def upload_image(account, instance_uuid, upload_type, image):
-    file_buffer = None
+        else:
+            raise ValueError(f"Invalid S3UploadType ({upload_type}) provided.")
 
-    if upload_type == S3UploadType.QR_CODE:
-        filename = build_bucket_path(account, instance_uuid, upload_type)
-        file_buffer = InMemoryUploadedFile(image, None, filename, 'image/png', image.getbuffer().nbytes, None)
+        return path
 
-    elif upload_type == S3UploadType.INSPECTION_IMAGE:
-        temp_location = image.temporary_file_path()
-        filename = generate_filename()
+    @staticmethod
+    def upload_image(account, instance_uuid, upload_type, image):
+        file_buffer = None
 
-        img = Image.open(temp_location, mode='r')
-        buffer = BytesIO()
-        img.save(buffer, format='PNG')
+        if upload_type == S3UploadType.QR_CODE:
+            filename = S3UploadUtils.build_bucket_path(account, instance_uuid, upload_type)
+            file_buffer = InMemoryUploadedFile(image, None, filename, 'image/png', image.getbuffer().nbytes, None)
 
-        print("THE BUFFER :: " + str(img))
+        elif upload_type == S3UploadType.INSPECTION_IMAGE:
+            temp_path = image.temporary_file_path()
 
-        bucket_path = build_bucket_path(account, instance_uuid, upload_type, filename=filename)
-        file_buffer = InMemoryUploadedFile(img, None, bucket_path, 'image/png', buffer.getbuffer().nbytes, None)
+            # open the image with Pillow
+            img = Image.open(temp_path, mode='r')
+            img.thumbnail(size=MAX_IMAGE_SIZE)
 
-    else:
-        raise ValueError(f"Invalid S3UploadType ({upload_type}) provided.")
+            # Create a bytes buffer and save the image into the buffer
+            img_buffer = BytesIO()
+            img.save(img_buffer, format='PNG', quality=25, optimize=True)
 
-    return file_buffer
+            # create a Django friendly file
+            the_image = File(img_buffer, name=f'{S3UploadUtils.generate_filename()}.png')
+            return the_image
+
+        else:
+            raise ValueError(f"Invalid S3UploadType ({upload_type}) provided.")
+
+        return file_buffer
+
+    @staticmethod
+    def generate_filename():
+        return ''.join(random.choices(string.ascii_lowercase + string.ascii_uppercase + string.digits, k=21))
