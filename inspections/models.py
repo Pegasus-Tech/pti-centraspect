@@ -1,8 +1,17 @@
 from django.db import models
 from centraspect.models import BaseModel
+from centraspect.utils import S3UploadType, S3UploadUtils
 from inspection_forms.models import InspectionForm
 from inspection_items.models import InspectionItem
 from authentication.models import Account, User
+
+
+def qr_directory_path(instance, filename):
+    bucket_path = S3UploadUtils.build_upload_to_path(instance.inspection.account,
+                                                instance.inspection.uuid,
+                                                S3UploadType.INSPECTION_IMAGE,)
+    path = f'inspections/{bucket_path}/{filename}'
+    return path
 
 
 class InspectionManager(models.Manager):
@@ -59,3 +68,8 @@ class Inspection(BaseModel):
             "completed_past_due": self.completed_past_due,
             "failed_inspection": self.failed_inspection
         }
+
+
+class InspectionImage(BaseModel):
+    inspection = models.ForeignKey(Inspection, on_delete=models.PROTECT)
+    image = models.ImageField(upload_to=qr_directory_path, max_length=1000, blank=True, null=True)

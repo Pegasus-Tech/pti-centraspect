@@ -40,6 +40,8 @@ AWS_S3_OBJECT_PARAMETERS = {
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage' 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
+MAX_IMAGE_SIZE = (500, 500)
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('APP_SECRET')
 ADMIN_USER_PW = 'nitsuj3106D!'
@@ -67,6 +69,8 @@ INSTALLED_APPS = [
     'rest_framework_swagger',
     'django_filters',
     'storages',
+    'webpack_loader',
+    
     'authentication',
     'dashboard',
     'inspection_forms',
@@ -102,6 +106,15 @@ ROOT_URLCONF = 'centraspect.urls'
 STATICFILES_DIRS = [
     STATIC_DIR
 ]
+
+WEBPACK_LOADER = {
+  'DEFAULT': {
+    'CACHE': not DEBUG,
+    'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
+    'POLL_INTERVAL': 0.1,
+    'IGNORE': [r'.+\.hot-update.js', r'.+\.map'],
+  }
+}
 
 TEMPLATES = [
     {

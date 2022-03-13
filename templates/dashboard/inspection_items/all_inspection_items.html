@@ -1,8 +1,11 @@
 {% extends '../../layouts/base.html' %}]
 {% load static %}
 {% load pagination_parameters %}
+{% load render_bundle from webpack_loader %}
+{% render_bundle 'equipment' %}
 
 {% block body %}
+{#    <div id="equipment-root"></div>#}
 
     <h1 class="uk-margin-top">Manage Inspection Equipment</h1>
     <hr class="uk-divider-icon"/>
@@ -320,3 +323,6 @@
         </div>
     {% endif %}
 {% endblock body %}
+{% block added_js %}
+
+{% endblock added_js %}
