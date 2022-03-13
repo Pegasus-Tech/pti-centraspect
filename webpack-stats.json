@@ -1,0 +1,14 @@
+{
+  "status": "done",
+  "assets": {
+    "equipment.bundle.js": {
+      "name": "equipment.bundle.js",
+      "path": "/Users/justindodson/Documents/Development/Python/pti-centraspect/static/javascripts/equipment.bundle.js"
+    }
+  },
+  "chunks": {
+    "equipment": [
+      "equipment.bundle.js"
+    ]
+  }
+}

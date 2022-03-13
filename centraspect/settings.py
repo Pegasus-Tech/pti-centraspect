@@ -67,6 +67,8 @@ INSTALLED_APPS = [
     'rest_framework_swagger',
     'django_filters',
     'storages',
+    'webpack_loader',
+    
     'authentication',
     'dashboard',
     'inspection_forms',
@@ -102,6 +104,15 @@ ROOT_URLCONF = 'centraspect.urls'
 STATICFILES_DIRS = [
     STATIC_DIR
 ]
+
+WEBPACK_LOADER = {
+  'DEFAULT': {
+    'CACHE': not DEBUG,
+    'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
+    'POLL_INTERVAL': 0.1,
+    'IGNORE': [r'.+\.hot-update.js', r'.+\.map'],
+  }
+}
 
 TEMPLATES = [
     {
