@@ -43,7 +43,7 @@ def attach_photos_to_inspection(request, uuid):
                     inspection_image.save()
                     counter += 1
                 except Exception as e:
-                    return JsonResponse(status=400, data={"Error": e})
+                    return JsonResponse(status=400, data={"Error": str(e)})
 
             return JsonResponse(status=200, data={"Success": f"{counter} image(s) uploaded"})
         return JsonResponse(status=422,
