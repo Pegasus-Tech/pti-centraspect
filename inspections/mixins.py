@@ -1,6 +1,7 @@
 from .models import Inspection
 from datetime import date, timedelta
 
+import json
 
 class LogInspectionMixin:
 
@@ -22,7 +23,7 @@ class LogInspectionMixin:
                 item=item,
                 form=item.form,
                 account=item.account,
-                json=json_form,
+                json=json.dumps({"test": "test"}),
                 completed_by=user,
                 completed_past_due=self.get_is_past_due(item.next_inspection_date),
                 failed_inspection=self.is_failed_inspection(disposition)
