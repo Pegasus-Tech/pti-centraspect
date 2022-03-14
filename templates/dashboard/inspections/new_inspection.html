@@ -1,7 +1,11 @@
 {% extends '../../layouts/base.html' %}
 
 {% block body %}
-    
+    <ul class="uk-margin-large-bottom uk-margin-top uk-subnav uk-breadcrumb">
+        <li><a href="{% url 'inspection_items:list' %}">Manage Equipment</a></li>
+        <li><a href="{% url 'inspection_items:details' uuid=item.uuid %}">{{item.title}}</a></li>
+        <li class="uk-disabled"><a>Log Inspection</a></li>
+    </ul>
     <h2 class="uk-margin-top">Log New Inspection: <a class="uk-link-text" href="{% url 'inspection_items:details' uuid=item.uuid %}">{{item.title}}</a></h2>
     <hr class="uk-divider-icon"/>
     <form id="log-new-inspection-form" class="uk-margin-bottom" action="{% url 'inspections:create' uuid=item.uuid %}" method="POST"> {% csrf_token %}

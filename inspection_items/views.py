@@ -8,8 +8,9 @@ from django.views.generic import ListView, CreateView, DetailView
 from django.views.generic.base import View
 from django.views.generic.edit import UpdateView
 
+from inspection_forms.models import InspectionForm
 from qr_codes.behaviors import QRCodeGeneratorMixin
-from .forms import InspectionItemForm
+from .forms import InspectionItemForm, AddFormToItemForm
 from .models import InspectionItem
 from .filters import InspectionItemsFilters
 from . import service
@@ -54,7 +55,7 @@ class InspectionItemCreateView(LoginRequiredMixin, QRCodeGeneratorMixin, CreateV
 
     def post(self, request, **kwargs: Any) -> Union[HttpResponseRedirect, HttpResponsePermanentRedirect]:
         print(f'REQUEST :: {self.request.POST}')
-        new_item = InspectionItemForm(self.request.POST or None).save(commit=False)
+        new_item = InspectionItemForm(self.request.user.account, self.request.POST or None).save(commit=False)
 
         new_item.account = self.request.user.account
         new_item.save()
@@ -70,8 +71,10 @@ class InspectionItemDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
+        context['form'] = AddFormToItemForm(account=self.request.user.account)
         context['inspections'] = service.get_all_inspections_for_item(self.get_object())
         context['closure_rate'] = service.get_completion_rate_for_item(self.get_object())
+        context['forms'] = InspectionForm.objects.get_all_active_for_account(self.request.user.account)
         return context
 
 
@@ -83,7 +86,7 @@ class InspectionItemUpdateView(LoginRequiredMixin, UpdateView):
         inspection_item = get_object_or_404(InspectionItem, uuid=uuid)
 
         if inspection_item is not None:
-            form = InspectionItemForm(None, instance=inspection_item)
+            form = InspectionItemForm(self.request.user.account, None, instance=inspection_item)
             context = {"form": form, "inspection_item": inspection_item}
             return render(request=self.request, template_name=template_name, context=context)
         else:
@@ -93,7 +96,7 @@ class InspectionItemUpdateView(LoginRequiredMixin, UpdateView):
     def post(self, request, uuid, **kwargs: Any) -> \
             Union[HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect]:
         inspection_item = get_object_or_404(InspectionItem, uuid=uuid)
-        form = InspectionItemForm(self.request.POST or None, instance=inspection_item)
+        form = InspectionItemForm(self.request.user.account, self.request.POST or None, instance=inspection_item)
 
         if form.is_valid:
             form.save()
@@ -111,6 +114,16 @@ class InspectionItemDeleteView(LoginRequiredMixin, View):
         instance.is_deleted = True
         instance.save()
         return redirect(reverse_lazy('inspection_items:list'))
+
+
+def add_form_to_inspection_item(request, uuid):
+    if request.POST:
+        inspection_item = get_object_or_404(InspectionItem, uuid=uuid)
+        form = AddFormToItemForm(request.user.account, request.POST)
+        if form.is_valid():
+            inspection_item.form = form.cleaned_data['form']
+            inspection_item.save()
+    return redirect('inspection_items:details', uuid=uuid)
 
 
 def clear_filters(request):

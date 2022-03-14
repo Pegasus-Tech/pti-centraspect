@@ -37,7 +37,7 @@ class InspectionFormListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        forms = InspectionForm.objects.get_all_for_account(self.request.user.account)
+        forms = InspectionForm.objects.get_all_active_for_account(self.request.user.account)
         context['forms'] = forms
         return context
 

@@ -19,6 +19,16 @@ def qr_directory_path(instance, filename):
 
 class InspectionItemManager(models.Manager):
 
+    def get_all_active_for_account(self, account):
+        if account is not None:
+            qs = self.get_queryset().all().filter(is_active=True)\
+                .filter(is_deleted=False)\
+                .filter(failed_inspection=False)
+            return qs
+        else:
+            raise ValueError("Account cannot be None")
+
+
     def get_count_past_due(self, account):
         if account is not None:
             qs = self.get_queryset().all()
