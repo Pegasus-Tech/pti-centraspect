@@ -86,7 +86,7 @@ def user_detail_view(request, uuid):
 
         except ValueError as e:
             print("Error getting equipment for user :: " + str(e))
-            error = f"An unexpected error occurred trying to retrieve {user.get_full_name()}'s assigned equipment.\n" \
+            error = f"An unexpected error occurred trying to retrieve {user.get_full_name}'s assigned equipment.\n" \
                     f"Please contact your System Admin for support in resolving this issue."
             messages.error(request, error)
             return redirect('users:all')
