@@ -26,7 +26,7 @@ class InspectionItemForm(forms.ModelForm):
     last_inspection_date = forms.DateField(required=False, widget=forms.TextInput(attrs={'class':'uk-input', 'type':'date'}))
     next_inspection_date = forms.DateField(widget=forms.TextInput(attrs={'class':'uk-input', 'type':'date'}))
     expiration_date = forms.DateField(required=False, widget=forms.TextInput(attrs={'class':'uk-input', 'type':'date'}))
-    assigned_to = forms.ModelChoiceField(required=False, queryset=User.objects.all(), widget=forms.Select(attrs={'class':'uk-select'}))
+    assigned_to = forms.ModelChoiceField(required=False, queryset=User.objects.all().filter(is_active=True), widget=forms.Select(attrs={'class':'uk-select'}))
     form = forms.ModelChoiceField(required=False, queryset=InspectionForm.objects.all(), widget=forms.Select(attrs={'class':'uk-select'}))
 
     class Meta:

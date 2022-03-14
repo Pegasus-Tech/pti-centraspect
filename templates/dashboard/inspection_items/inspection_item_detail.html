@@ -132,7 +132,11 @@
                                         <dl class="uk-description-list">
                                             <dt>Assigned To</dt>
                                             {% if object.assigned_to %}
-                                                <dd>{{object.assigned_to.get_full_name|truncatechars:15}}</dd>
+                                                <dd>
+                                                    <a class="uk-link-text" href="{{ object.assigned_to.absolute_url }}">
+                                                        {{object.assigned_to.get_full_name|truncatechars:15}}
+                                                    </a>
+                                                </dd>
                                             {% else %}
                                                 <dd>--</dd>
                                             {% endif %}

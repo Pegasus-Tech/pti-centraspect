@@ -116,3 +116,10 @@ def generate_qr_code_callback(sender, instance, created, *args, **kwargs):
                                                        serialized_data=data)
         instance.qr_code = qr_code
         instance.save()
+
+
+@receiver(post_save, sender=InspectionItem)
+def generate_inspections(sender, instance, created, *args, **kwargs):
+    if created:
+        pass
+    return None

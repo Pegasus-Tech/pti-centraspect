@@ -1,0 +1,79 @@
+{% extends '../../layouts/base.html' %}
+{% load static %}
+{% block body %}
+    <ul class="uk-margin-large-bottom uk-margin-top uk-subnav uk-breadcrumb">
+        <li><a href="{% url 'users:all' %}">{{ request.user.account.name }} - Users</a></li>
+        <li class="uk-disabled"><a>{{user.get_full_name}}</a></li>
+    </ul>
+    {% if messages %}
+        {% for msg in messages %}
+            {% if msg.level_tag == 'error' %}
+                <div class="uk-alert-danger uk-margin-top" uk-alert>
+                    <a class="uk-alert-close" uk-close></a>
+                    <p>{{msg}}</p>
+                </div>
+            {% elif msg.level_tag == 'success' %}
+                <div class="uk-alert-success uk-margin-top" uk-alert>
+                    <a class="uk-alert-close" uk-close></a>
+                    <p>{{msg}}</p>
+                </div>
+
+            {% elif msg.level_tag == 'warning' %}
+                <div class="uk-alert-warning uk-margin-top" uk-alert>
+                    <a class="uk-alert-close" uk-close></a>
+                    <p>{{msg}}</p>
+                </div>
+            {% endif %}
+        
+        {% endfor %}
+        
+    {% endif %}
+
+    <h1 class="uk-margin-top">User - {{ user.get_full_name }}</h1>
+    <hr class="uk-divider-icon"/>
+
+    <h3>Equipment List</h3>
+
+    <table class="uk-table uk-table-striped">
+        <thead>
+            <tr>
+                <th>Equipment</th>
+                <th>Serial Number</th>
+                <th>Last Inspected Date</th>
+                <th>Next Inspection Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for eq in equipement %}
+                <tr>
+                    <td><a class="uk-link-text" href="{{ eq.get_absolute_url }}">{{ eq.title }}</a></td>
+                    <td>{{ eq.serial_number|default_if_none:"--" }}</td>
+                    <td>{{ eq.last_inspection_date|default_if_none:"--" }}</td>
+                    <td>{{ eq.next_inspection_date|default_if_none:"--" }}</td>
+                    <td>
+                        <a href="{{ eq.get_absolute_url }}" uk-icon="icon: desktop" uk-tooltip="View"></a>
+                        <a href="{% url 'inspection_items:update' uuid=eq.uuid %}" uk-icon="icon: pencil"
+                           uk-tooltip="Edit">
+                        </a>
+                        <a href="#qr-modal-{{ eq.uuid }}" uk-toggle uk-tooltip="View QR Code">
+                            <img class="uk-icon-image" src="{% static '/images/qr_icon.png' %}"/>
+                        </a>
+                    </td>
+                </tr>
+
+                <div id="qr-modal-{{ eq.uuid }}" class="uk-flex-top" uk-modal>
+                    <div class="uk-modal-dialog uk-margin-auto-vertical">
+                        <div>
+                            {% if eq.qr_code %}
+                                <img src="{{ eq.qr_code.url|default_if_none:"#" }}" alt="QR Code"/>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock body %}
+

@@ -4,7 +4,7 @@ from django.db.models import QuerySet
 from django.http.request import QueryDict
 from .models import InspectionItem
 from inspections.models import Inspection
-from authentication.models import Account
+from authentication.models import Account, User
 
 
 def get_all_inspections_for_item(inspection_item) -> QuerySet:
@@ -26,7 +26,6 @@ def get_completion_rate_for_item(inspection_item) -> int:
     return round(closure_rate, 0)
 
 
-# TODO: pull is_active=True into a decorator
 def get_all_items_for_account(*, account: Account,
                               params: QueryDict = None,
                               ) -> Iterable[InspectionItem]:
@@ -40,7 +39,7 @@ def get_all_items_for_account(*, account: Account,
         order_str = f'{order_str_prepend}{sort_col}'
 
     if account is not None:
-        qs = InspectionItem.objects.all().filter(is_active=True).order_by(order_str)
+        qs = InspectionItem.objects.get_all_active_for_account(account=account).order_by(order_str)
         qs = qs.filter(account=account)
         return qs
 
@@ -59,7 +58,7 @@ def sort_queryset(*, qs: QuerySet, params: QueryDict = None) -> Iterable[Inspect
 
 def get_unique_item_types_for_account(*, account: Account) -> Iterable[str]:
     if account is not None:
-        qs = InspectionItem.objects.all().filter(is_active=True)
+        qs = InspectionItem.objects.get_all_active_for_account(account=account)
         return qs.order_by('inspection_type')\
             .values_list('inspection_type', flat=True)\
             .distinct('inspection_type')
@@ -67,7 +66,15 @@ def get_unique_item_types_for_account(*, account: Account) -> Iterable[str]:
 
 def get_unique_inspection_intervals_for_account(*, account: Account) -> Iterable[str]:
     if account is not None:
-        qs = InspectionItem.objects.all().filter(is_active=True)
+        qs = InspectionItem.objects.get_all_active_for_account(account=account)
         return qs.order_by('inspection_interval')\
             .values_list('inspection_interval', flat=True)\
             .distinct('inspection_interval')
+
+
+def get_all_items_assigned_to_user(*, user: User) -> QuerySet:
+    if user is not None:
+        qs = InspectionItem.objects.get_all_active_for_account(account=user.account)
+        return qs.filter(assigned_to=user)
+    else:
+        raise ValueError(f"User cannot be None type")

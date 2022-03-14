@@ -42,14 +42,15 @@
             {% for u in users %}
                 <tr>
                     <td class="uk-text-bolder">
-                        {{u.get_full_name}}
+                        <a class="uk-link-text" href="{% url 'users:details' uuid=u.uuid %}">{{u.get_full_name}}</a>
                     </td>
                     <td>{{u.uuid}}</td>
                     <td>{{u.email}}</td>
                     <td>{{u.readable_role}}</td>
                     
                     <td>
-                        <a href="" uk-icon="icon: pencil" uk-tooltip="Edit {{u.get_full_name}}"></a>
+                        <a href="{{ u.absolute_url }}" uk-icon="icon: desktop" uk-tooltip="View"></a>
+{#                        <a href="" uk-icon="icon: pencil" uk-tooltip="Edit {{u.get_full_name}}"></a>#}
                         {% if u != user %}
                             <a href="#delete-confirmation-{{u.uuid}}" uk-toggle uk-icon="icon: ban" uk-tooltip="Deactivate {{u.get_full_name}}"></a>
                         {% endif %}

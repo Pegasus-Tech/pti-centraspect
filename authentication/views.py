@@ -1,13 +1,12 @@
-from typing import Any, Dict
 from django.shortcuts import redirect, render
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import HttpResponseRedirect
 from django.views.generic import ListView, CreateView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse
 from authentication.forms import AdminCreateUserForm
 from authentication.models import User, Account
+from inspection_items import service as equipment_service
 
 
 def registration_view(request):
@@ -42,7 +41,9 @@ def registration_view(request):
 def login_view(request):
     context = {}
     if request.method == 'GET':
-        return render(request, 'registration/login.html', context)
+        if request.user.is_authenticated:
+            return redirect('dashboard')
+        return render(request, 'registration/login.html')
     
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -68,6 +69,33 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
+
+
+@login_required
+def user_detail_view(request, uuid):
+    if request.method == 'GET':
+        context = {}
+        try:
+            user = User.objects.get(uuid=uuid)
+            context['user'] = user
+
+            equipment = equipment_service.get_all_items_assigned_to_user(user=user)
+            context['equipement'] = equipment
+
+            return render(request, 'dashboard/users/user_details.html', context=context)
+
+        except ValueError as e:
+            print("Error getting equipment for user :: " + str(e))
+            error = f"An unexpected error occurred trying to retrieve {user.get_full_name()}'s assigned equipment.\n" \
+                    f"Please contact your System Admin for support in resolving this issue."
+            messages.error(request, error)
+            return redirect('users:all')
+
+        except Exception as e:
+            print("Error getting user :: " + str(e))
+            error = f'ERROR: No user found with UUID {uuid}'
+            messages.error(request, error)
+            return redirect('users:all')
         
 
 class AccountUsersListView(LoginRequiredMixin, ListView):
@@ -93,7 +121,7 @@ class AccountCreateUserView(LoginRequiredMixin, CreateView):
             user.account = request.user.account
             try:
                 user.save()
-                messages.success(request, f"Success! {user.get_full_name()} was created.")
+                messages.success(request, f"Success! {user.get_full_name} was created.")
             except Exception as e:
                 print(f'Error Creating User :: {e}')
                 messages.error(request, f'Error: {e}')
@@ -114,7 +142,7 @@ class AccountUserDeactivateView(LoginRequiredMixin, View):
             if user is not None:
                 user.is_active = False
                 user.save()
-                messages.warning(request, f'{user.get_full_name()} has been deactivated.')
+                messages.warning(request, f'{user.get_full_name} has been deactivated.')
                 return redirect('users:all')
         except Exception as e:
             print(f"Error Deactivating User :: {e}")

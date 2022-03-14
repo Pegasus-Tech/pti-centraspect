@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, PermissionsMixin
+from django.shortcuts import reverse
 from django.utils.translation import gettext_lazy as _
 from centraspect.models import BaseModel
 import uuid
@@ -38,9 +39,14 @@ class User(AbstractUser, PermissionsMixin):
 
     def __str__(self) -> str:
         return f'{self.first_name} {self.last_name} - {self.username}'
-    
+
+    @property
     def get_full_name(self) -> str:
         return f'{self.first_name} {self.last_name}'
+
+    @property
+    def absolute_url(self):
+        return reverse("users:details", kwargs={"uuid": self.uuid})
     
     @property
     def readable_role(self) -> str:

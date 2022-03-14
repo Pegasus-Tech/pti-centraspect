@@ -40,7 +40,7 @@ urlpatterns = [
     path('logout/', logout_view, name='logout'),
     
     path('dashboard/', DashboardView.as_view(), name='dashboard'),
-    path('dashboard/users', include('authentication.urls', namespace="users")),
+    path('dashboard/users/', include('authentication.urls', namespace="users")),
     path('dashboard/inspection-items/', include('inspection_items.urls', namespace="inspection_items")),
     path('dashboard/inspection-calendar', include('inspection_calendar.urls', namespace="inspection_calendar")),
     path('dashboard/form-builder', include('inspection_forms.urls', namespace="inspection_forms")),
