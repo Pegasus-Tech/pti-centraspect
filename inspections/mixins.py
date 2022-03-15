@@ -18,12 +18,14 @@ class LogInspectionMixin:
         json_form = kwargs.get('completed_form')
         disposition = kwargs.get('inspection_disposition')
 
+        print(f"Got JSON form :: {json_form}")
+
         try:
             inspection = Inspection.objects.create(
                 item=item,
                 form=item.form,
                 account=item.account,
-                json=json.dumps({"test": "test"}),
+                json=json_form,
                 completed_by=user,
                 completed_past_due=self.get_is_past_due(item.next_inspection_date),
                 failed_inspection=self.is_failed_inspection(disposition)
