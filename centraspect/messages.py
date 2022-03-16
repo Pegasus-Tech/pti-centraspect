@@ -1,0 +1,5 @@
+GENERIC_ERROR = "An Unknown Error Occurred"
+INVALID_AUTH_TOKEN_ERROR = "Invalid Auth Token Provided"
+NO_AUTH_TOKEN_PROVIDED_ERROR = "No Auth Token Found in Request Body"
+INVALID_REFRESH_TOKEN_ERROR = "Invalid Refresh Token Provided"
+NO_REFRESH_TOKEN_PROVIDED_ERROR = "No Refresh Token Found in Request Body"

@@ -17,6 +17,7 @@ from django.conf.urls import include
 from django.contrib import admin
 from django.urls import path, re_path
 from authentication.views import registration_view, login_view, logout_view
+from authentication.api_view import get_auth_token
 from dashboard.views import DashboardView
 from .views import LandingPage
 from rest_framework import permissions
@@ -38,6 +39,7 @@ urlpatterns = [
     path('register/', registration_view, name='signup'),
     path('login/', login_view, name='login'),
     path('logout/', logout_view, name='logout'),
+    path('api/auth/', include('authentication.urls', namespace='api_auth')),
     
     path('dashboard/', DashboardView.as_view(), name='dashboard'),
     path('dashboard/users/', include('authentication.urls', namespace="users")),
