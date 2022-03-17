@@ -7,6 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import Token
 from centraspect import messages
 from centraspect.decorators import token_required
+from centraspect.exceptions import InvalidTokenError
 
 
 @csrf_exempt
@@ -26,8 +27,23 @@ def get_auth_token(request):
 def refresh_auth_token(request):
     if request.method == "POST":
         data = json.loads(request.body)
-        # TODO: validate the refresh token then refresh and then return the updated token response.
+        refresh_token = data.get('refresh_token') or None
+        token_obj = Token.objects.filter(refresh_token=refresh_token) or None
 
+        if refresh_token is None:
+            return JsonResponse(status=400, data={'error_message': messages.NO_REFRESH_TOKEN_PROVIDED_ERROR})
+
+        else:
+            try:
+                token = token_obj.get()
+                token.refresh_auth_token(provided_refresh=refresh_token)
+                return JsonResponse(status=200,  data=token.to_json)
+
+            except InvalidTokenError:
+                return JsonResponse(status=400, data={"error_message": messages.INVALID_REFRESH_TOKEN_ERROR})
+
+
+# TODO: remove method after testing with Mobile App
 @csrf_exempt
 @token_required
 def access_this(request):
