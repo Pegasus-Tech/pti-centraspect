@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.views.generic import ListView, CreateView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from authentication.forms import AdminCreateUserForm
-from authentication.models import User, Account
+from authentication.models import User, Account, Roles
 from inspection_items import service as equipment_service
 
 
@@ -24,7 +24,8 @@ def registration_view(request):
             username=request.POST.get('email'),
             email=request.POST.get('email'),
             first_name=request.POST.get('first_name'),
-            last_name=request.POST.get('last_name'))
+            last_name=request.POST.get('last_name'),
+            role=Roles.ACCOUNT_ADMIN)
         user.set_password(request.POST.get('password'))
         user.save()
         

@@ -45,6 +45,7 @@ MAX_IMAGE_SIZE = (500, 500)
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('APP_SECRET')
 ADMIN_USER_PW = 'nitsuj3106D!'
+AUTH_TOKEN_EXPIRY = os.environ.get('AUTH_TOKEN_EXPIRY') or 60 * 60
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
