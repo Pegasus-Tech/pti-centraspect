@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 
 from .serializers import InspectionFormSerializer
 from authentication.models import User
+from centraspect.messages import NO_FORM_ATTACHED_ERROR, INVALID_INSPECTION_ITEM_UUID
 from centraspect.utils import S3UploadType, S3UploadUtils
 from inspection_forms.models import InspectionForm
 from inspection_items import service as inspection_item_service
@@ -56,7 +57,13 @@ class FormItemAPIView(LogInspectionMixin, APIView):
 
     def get(self, request, uuid):
         print(f'looking for form :: {uuid}')
-        item = InspectionItem.objects.get(uuid=uuid)
+        items = InspectionItem.objects.filter(uuid=uuid)
+
+        if not items.exists():
+            return JsonResponse(status=404, data={"error_message": INVALID_INSPECTION_ITEM_UUID})
+
+        item = items[0]
+
         serialized = {
             "inspection_item_title": item.title,
             "inspection_item_uuid": item.uuid,
@@ -66,7 +73,7 @@ class FormItemAPIView(LogInspectionMixin, APIView):
             "inspection_form_uuid": item.form.uuid if item.form is not None else None,
             "inspection_form": item.form.form_json if item.form is not None else None
         }
-        return Response(serialized)
+        return JsonResponse(status=200, data=serialized)
 
     def post(self, request, uuid):
         print(f"Getting reqeust :: {self.request.data['inspection_form_filled']} for form uuid {uuid}")
@@ -82,6 +89,11 @@ class FormItemAPIView(LogInspectionMixin, APIView):
             print(f'No disposition attached to request')
             return JsonResponse(data={"Error": "No disposition attached to request"}, status=400)
         finally:
+
+            if data['inspection_form_filled'] is None or data['inspection_form_filled'] == '':
+                resp = {"error_message": NO_FORM_ATTACHED_ERROR}
+                return JsonResponse(status=400, data=resp)
+
             inspection = self.log_inspection(inspection_item=item,
                                              logged_by=user,
                                              completed_form=data['inspection_form_filled'],
