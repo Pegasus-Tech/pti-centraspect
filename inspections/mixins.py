@@ -21,7 +21,7 @@ class LogInspectionMixin:
          json_form,
          disposition,
          rtn
-         ) = self.__validate_inspection_log_params(**kwargs, rtn=rtn)
+         ) = self.__validate_inspection_log_params(kwargs, rtn=rtn)
 
         if not is_valid:
             return rtn

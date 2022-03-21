@@ -67,7 +67,28 @@ class LogInspectionTestCase(TestCase):
         self.assertEqual(data['error_message'], messages.INVALID_INSPECTION_ITEM_UUID)
 
     def test_api_post_new_inspection_log_success(self):
-        pass
+        the_item = InspectionItem.objects.get(title='Test Inspection')
+        body = {"disposition": "passed", "inspection_form_filled": "{'test_field':'test_answer'}"}
+        resp = self.client.post(path=f"/api/forms/{the_item.uuid}", data=body)
 
-    def test_api_post_new_inspection_log_invalid_params(self):
-        pass
+        data = json.loads(resp.content)
+
+        self.assertEqual(resp.status_code, 201)
+        self.assertIn('url', data.keys())
+        self.assertIn('inspection_log', data.keys())
+
+    def test_api_post_new_inspection_log_with_empty_form_json(self):
+        the_item = InspectionItem.objects.get(title='Test Inspection')
+        body = {"disposition": "passed", "inspection_form_filled": ""}
+        resp = self.client.post(path=f"/api/forms/{the_item.uuid}", data=body)
+
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(json.loads(resp.content)['error_message'], messages.NO_FORM_ATTACHED_ERROR)
+
+    def test_api_post_new_inspection_log_with_no_form_json(self):
+        the_item = InspectionItem.objects.get(title='Test Inspection')
+        body = {"disposition": "passed"}
+        resp = self.client.post(path=f"/api/forms/{the_item.uuid}", data=body)
+
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(json.loads(resp.content)['error_message'], messages.NO_FORM_ATTACHED_ERROR)

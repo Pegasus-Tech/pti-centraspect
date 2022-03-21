@@ -1,6 +1,5 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .serializers import InspectionFormSerializer
@@ -76,10 +75,11 @@ class FormItemAPIView(LogInspectionMixin, APIView):
         return JsonResponse(status=200, data=serialized)
 
     def post(self, request, uuid):
-        print(f"Getting reqeust :: {self.request.data['inspection_form_filled']} for form uuid {uuid}")
+        print(f"Getting reqeust :: {self.request.data} for form uuid {uuid}")
         data = self.request.data
         item = InspectionItem.objects.get(uuid=uuid)
         disposition = None
+        filled_form = data.get('inspection_form_filled') or None
 
         # TODO - update User to be the authed user from the mobile app
         user = User.objects.filter(account__user__is_superuser=True).first()
@@ -90,7 +90,7 @@ class FormItemAPIView(LogInspectionMixin, APIView):
             return JsonResponse(data={"Error": "No disposition attached to request"}, status=400)
         finally:
 
-            if data['inspection_form_filled'] is None or data['inspection_form_filled'] == '':
+            if filled_form is None or filled_form == '':
                 resp = {"error_message": NO_FORM_ATTACHED_ERROR}
                 return JsonResponse(status=400, data=resp)
 
