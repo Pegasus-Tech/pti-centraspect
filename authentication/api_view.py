@@ -20,7 +20,7 @@ def get_auth_token(request):
             token = Token.objects.get_or_create(user=user)[0]
             return JsonResponse(status=200,  data=token.to_json)
         else:
-            return JsonResponse(status=400, data={"Credential Error", "Invalid Credentials Provided"}, safe=True)
+            return JsonResponse(status=400, data={"Credential Error": "Invalid Credentials Provided"})
 
 
 @csrf_exempt
