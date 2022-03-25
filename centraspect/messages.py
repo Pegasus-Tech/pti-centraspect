@@ -9,3 +9,4 @@ NO_INSPECTION_ITEM_PROVIDE = "No inspection item related to inspection log"
 NO_LOGGED_BY_USER_PROVIDED = "No User was provided with inspection log. Cannot completed inspection with an inspector."
 NO_INSPECTION_DISPOSITION_PROVIDED = "No disposition was provided with inspection log."
 INVALID_INSPECTION_ITEM_UUID = 'Invalid UUID provided for Inspection Item'
+INVALID_USER_CREDENTIAL_ERROR = 'Invalid Credentials Provided'

@@ -22,7 +22,7 @@ def get_auth_token(request):
                 token = Token.objects.get_or_create(user=user)[0]
                 return JsonResponse(status=200,  data=token.to_json)
             else:
-                return JsonResponse(status=400, data={"Credential Error": "Invalid Credentials Provided"})
+                return JsonResponse(status=400, data={"Credential Error": messages.INVALID_USER_CREDENTIAL_ERROR})
         except Exception as e:
             print(e)
 
@@ -39,9 +39,12 @@ def refresh_auth_token(request):
 
         else:
             try:
-                token = token_obj.get()
-                token.refresh_auth_token(provided_refresh=refresh_token)
-                return JsonResponse(status=200,  data=token.to_json)
+                if token_obj is None:
+                    return JsonResponse(status=400, data={"error_message": messages.INVALID_REFRESH_TOKEN_ERROR})
+                else:
+                    token = token_obj.get()
+                    token.refresh_auth_token(provided_refresh=refresh_token)
+                    return JsonResponse(status=200,  data=token.to_json)
 
             except InvalidTokenError:
                 return JsonResponse(status=400, data={"error_message": messages.INVALID_REFRESH_TOKEN_ERROR})
