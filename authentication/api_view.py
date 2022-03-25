@@ -14,13 +14,17 @@ from centraspect.exceptions import InvalidTokenError
 def get_auth_token(request):
     if request.method == 'POST':
         creds = json.loads(request.body)
-        user = authenticate(username=creds['email'], password=creds['password'])
 
-        if user is not None:
-            token = Token.objects.get_or_create(user=user)[0]
-            return JsonResponse(status=200,  data=token.to_json)
-        else:
-            return JsonResponse(status=400, data={"Credential Error": "Invalid Credentials Provided"})
+        try:
+            user = authenticate(username=creds['email'], password=creds['password'])
+            print(f'User :: {user}')
+            if user is not None:
+                token = Token.objects.get_or_create(user=user)[0]
+                return JsonResponse(status=200,  data=token.to_json)
+            else:
+                return JsonResponse(status=400, data={"Credential Error": "Invalid Credentials Provided"})
+        except Exception as e:
+            print(e)
 
 
 @csrf_exempt

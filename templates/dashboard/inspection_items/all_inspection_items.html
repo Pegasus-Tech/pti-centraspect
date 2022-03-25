@@ -249,7 +249,7 @@
 
                 <div id="qr-modal-{{ item.uuid }}" class="uk-flex-top" uk-modal>
                     <div class="uk-modal-dialog uk-margin-auto-vertical">
-                        <div>
+                        <div uk-image class="uk-flex uk-flex-center uk-flex-middle uk-background-cover">
                             {% if item.qr_code %}
                                 <img src="{{ item.qr_code.url|default_if_none:"#" }}" alt="QR Code"/>
                             {% endif %}

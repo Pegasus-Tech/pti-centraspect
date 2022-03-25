@@ -63,8 +63,8 @@
                 </tr>
 
                 <div id="qr-modal-{{ eq.uuid }}" class="uk-flex-top" uk-modal>
-                    <div class="uk-modal-dialog uk-margin-auto-vertical">
-                        <div>
+                    <div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical">
+                        <div uk-image class="uk-flex uk-flex-center uk-flex-middle uk-background-cover">
                             {% if eq.qr_code %}
                                 <img src="{{ eq.qr_code.url|default_if_none:"#" }}" alt="QR Code"/>
                             {% endif %}
