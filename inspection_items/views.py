@@ -51,7 +51,7 @@ class InspectionItemCreateView(LoginRequiredMixin, QRCodeGeneratorMixin, CreateV
     def get_form(self, **kwargs: Any) -> InspectionItemForm:
         form_class = super().get_form(InspectionItemForm)
         form_class.fields['assigned_to'].queryset = self.request.user.account.user_set.all().filter(is_active=True)
-        form_class.fields['form'].queryset = self.request.user.account.inspectionform_set.all()
+        form_class.fields['form'].queryset = InspectionForm.objects.get_all_active_for_account(account=self.request.user.account)
         return form_class
 
     def post(self, request, **kwargs: Any) -> Union[HttpResponseRedirect, HttpResponsePermanentRedirect]:
