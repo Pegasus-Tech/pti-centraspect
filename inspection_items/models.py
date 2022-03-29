@@ -51,16 +51,10 @@ class InspectionItemManager(models.Manager):
 class InspectionInterval(models.TextChoices):
     DAILY = 'daily', _('Daily')
     WEEKLY = 'weekly', _('Weekly')
-    BI_WEEKLY = 'bi-weekly', _('Bi-Weekly')
-    SEMI_WEEKLY = 'semi-weekly', _('Semi-Weekly')
-    TEN_DAY = 'ten day', _('10 Day')
     MONTHLY = 'monthly', _('Monthly')
-    SEMI_MONTHLY = 'semi-monthly', _('Semi-Monthly')
     QUARTERLY = 'quarterly', _('Quarterly')
-    ANNUALLY = 'annually', _('Annually')
     SEMI_ANNUALLY = 'semi-annually', _('Semi-Annually')
-    BIENNIAL = 'biennial', _('Biennial')
-    TRIENNIAL = 'triennial', _('Triennial')
+    ANNUALLY = 'annually', _('Annually')
 
 
 class InspectionType(models.TextChoices):

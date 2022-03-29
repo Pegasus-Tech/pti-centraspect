@@ -55,17 +55,25 @@ class Inspection(BaseModel):
     form = models.ForeignKey(InspectionForm, on_delete=models.PROTECT)
     item = models.ForeignKey(InspectionItem, on_delete=models.PROTECT)
     account = models.ForeignKey(Account, on_delete=models.PROTECT)
-    json = models.JSONField(null=False, blank=False)
-    completed_by = models.ForeignKey(User, on_delete=models.PROTECT)
-    completed_date = models.DateTimeField(auto_now_add=True)
-    completed_past_due = models.BooleanField()
-    failed_inspection = models.BooleanField(null=False)
+    json = models.JSONField(null=True, blank=True)
+    completed_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
+    due_date = models.DateField(null=False)
+    completed_date = models.DateTimeField(null=True)
+    completed_past_due = models.BooleanField(null=True, default=False)
+    missed_inspection = models.BooleanField(null=True, default=False)
+    failed_inspection = models.BooleanField(null=True)
+    objects = InspectionManager()
 
     def to_json(self):
         return {
-            "uuid": self.uuid,
-            "completed_data": self.completed_date,
+            "uuid": str(self.uuid),
+            "due_date": str(self.due_date),
+            "title": self.item.title,
+            "item_uuid": str(self.item.uuid),
+            "inspection_type": self.item.inspection_type,
+            "completed_date": str(self.completed_date),
             "completed_past_due": self.completed_past_due,
+            "missed": self.missed_inspection,
             "failed_inspection": self.failed_inspection
         }
 

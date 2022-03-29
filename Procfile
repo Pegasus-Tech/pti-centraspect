@@ -1,1 +1,2 @@
-web: gunicorn centraspect.wsgi 
+web: gunicorn centraspect.wsgi
+worker: python manage.py qcluster

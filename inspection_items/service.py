@@ -12,6 +12,12 @@ def get_all_inspections_for_item(inspection_item) -> QuerySet:
     return qs
 
 
+def get_all_completed_inspections_for_item(inspection_item) -> QuerySet:
+    qs = Inspection.objects.get_all_for_item(item=inspection_item)
+    qs = qs.filter(completed_date__isnull=False).order_by('-completed_date')
+    return qs
+
+
 def get_inspection_by_uuid(uuid) -> Inspection:
     return Inspection.objects.get(uuid=uuid)
 

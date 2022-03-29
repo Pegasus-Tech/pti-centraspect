@@ -64,7 +64,7 @@
 {% block added_js %}
     <script type="module">
         import {loadFullCalendar} from "../../static/js/inspectionCalendar.js";
-        $(document).ready(loadFullCalendar( {{items|safe}} ));
+        $(document).ready(loadFullCalendar( {{inspections|safe}} ));
     </script>
 
 {% endblock added_js %}

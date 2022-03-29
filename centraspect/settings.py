@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     'django_filters',
     'storages',
     'webpack_loader',
+    'django_q',
     
     'authentication',
     'dashboard',
@@ -79,7 +80,8 @@ INSTALLED_APPS = [
     'inspection_calendar',
     'inspections',
     'qr_codes',
-    'api_backend'
+    'api_backend',
+    'task_worker'
 ]
 
 MIDDLEWARE = [
@@ -152,6 +154,18 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': '5432',
     }
+}
+
+Q_CLUSTER = {
+    'name': 'centraspect',
+    'workers': 8,
+    'recycle': 500,
+    'timeout': 60,
+    'compress': True,
+    'save_limit': 250,
+    'queue_limit': 500,
+    'cpu_affinity': 1,
+    'redis': os.environ.get('REDIS_URL') or 'redis://127.0.0.1:6379'
 }
 
 PASSWORD_HASHERS = [

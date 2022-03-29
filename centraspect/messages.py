@@ -10,3 +10,4 @@ NO_LOGGED_BY_USER_PROVIDED = "No User was provided with inspection log. Cannot c
 NO_INSPECTION_DISPOSITION_PROVIDED = "No disposition was provided with inspection log."
 INVALID_INSPECTION_ITEM_UUID = 'Invalid UUID provided for Inspection Item'
 INVALID_USER_CREDENTIAL_ERROR = 'Invalid Credentials Provided'
+UNAUTHENTICATED_USER_ERROR = 'The user trying to access this resource is not authenticated'

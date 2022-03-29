@@ -2,7 +2,8 @@ from .models import Inspection
 from datetime import date, timedelta
 
 from centraspect import messages
-import json
+from centraspect.utils import DateUtils
+from inspections import service as inspection_service
 
 
 class LogInspectionMixin:
@@ -27,17 +28,44 @@ class LogInspectionMixin:
             return rtn
 
         try:
-            inspection = Inspection.objects.create(
-                item=item,
-                form=item.form,
-                account=item.account,
-                json=json_form,
-                completed_by=user,
-                completed_past_due=self.get_is_past_due(item.next_inspection_date),
-                failed_inspection=self.is_failed_inspection(disposition)
-            )
+            # Find the interval block the inspection is in
+            interval_block = DateUtils.get_inspection_time_block(item.inspection_interval)
+
+            # Mark missed inspections as missed
+            inspection_service.update_missed_inspection_for_item(item=item, prior_to_date=interval_block[0])
+
+            # mark the appropriate inspection (either current block on-time or past due)
+            inspection_qs = inspection_service.get_inspection_by_item_in_date_range(item=item, date_range=interval_block)
+
+            inspection = None
+
+            # log inspection against the pending inspection
+            # within the current interval block
+            # else: Create a new one inspection log.
+            if inspection_qs.exists():
+                inspection = inspection_qs.get()
+                inspection.completed_date = date.today()
+                inspection.completed_by = user
+                inspection.completed_past_due = self.get_is_past_due(inspection.due_date)
+                inspection.failed_inspection = self.is_failed_inspection(disposition)
+                inspection.save()
+
+            else:
+                inspection = Inspection.objects.create(
+                    item=item,
+                    form=item.form,
+                    account=item.account,
+                    json=json_form,
+                    completed_by=user,
+                    due_date=date.today(),
+                    completed_date=date.today(),
+                    completed_past_due=False,
+                    failed_inspection=self.is_failed_inspection(disposition)
+                )
+
             rtn['inspection'] = inspection
             rtn['success'] = True
+
         except Exception as e:
             print(f"Error logging inspection from API :: {str(e)}")
             rtn['success'] = False
@@ -63,31 +91,18 @@ class LogInspectionMixin:
         return item
 
     def get_days_to_add(self, interval):
-
         if interval == 'daily':
             return 1
         elif interval == 'weekly':
             return 7
-        elif interval == 'bi-weekly':
-            return 14
-        elif interval == 'semi-weekly':
-            return 4
-        elif interval == 'ten day':
-            return 10
         elif interval == 'monthly':
             return 28
-        elif interval == 'semi-monthly':
-            return 15
         elif interval == 'quarterly':
             return 84
         elif interval == 'annually':
             return 365
         elif interval == 'semi-annually':
             return 183
-        elif interval == 'biennial':
-            return 730
-        elif interval == 'triennial':
-            return 1095
         else:
             return 0
 
@@ -113,6 +128,10 @@ class LogInspectionMixin:
             return is_valid, item, user, json_form, disposition, rtn
         if user is None:
             rtn['error'] = messages.NO_LOGGED_BY_USER_PROVIDED
+            is_valid = False
+            return is_valid, item, user, json_form, disposition, rtn
+        if not user.is_authenticated:
+            rtn['error'] = messages.UNAUTHENTICATED_USER_ERROR
             is_valid = False
             return is_valid, item, user, json_form, disposition, rtn
         if json_form is None:

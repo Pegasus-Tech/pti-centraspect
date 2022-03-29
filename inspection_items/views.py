@@ -7,6 +7,7 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, CreateView, DetailView
 from django.views.generic.base import View
 from django.views.generic.edit import UpdateView
+from django_q.tasks import async_task
 
 from inspection_forms.models import InspectionForm
 from qr_codes.behaviors import QRCodeGeneratorMixin
@@ -59,6 +60,7 @@ class InspectionItemCreateView(LoginRequiredMixin, QRCodeGeneratorMixin, CreateV
 
         new_item.account = self.request.user.account
         new_item.save()
+        async_task('task_worker.service.build_future_inspections', new_item)
         return redirect('inspection_items:list')
 
 
@@ -72,7 +74,7 @@ class InspectionItemDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['form'] = AddFormToItemForm(account=self.request.user.account)
-        context['inspections'] = service.get_all_inspections_for_item(self.get_object())
+        context['inspections'] = service.get_all_completed_inspections_for_item(self.get_object())
         context['closure_rate'] = service.get_completion_rate_for_item(self.get_object())
         context['forms'] = InspectionForm.objects.get_all_active_for_account(self.request.user.account)
         return context

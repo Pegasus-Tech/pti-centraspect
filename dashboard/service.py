@@ -1,11 +1,17 @@
 from datetime import datetime, timedelta
-from inspection_items.models import InspectionItem
-from inspection_items.service import get_all_items_for_account
 from inspections.models import Inspection
 
 
 def get_upcoming_inspections_for_account(account):
-    return get_all_items_for_account(account=account)
+    qs = Inspection.objects.get_all_for_account(account=account)
+    return qs
+
+
+def get_inspections_for_calendar(inspections):
+    json_list = []
+    for inspection in inspections:
+        json_list.append(inspection.to_json())
+    return json_list
 
 
 def get_dashboard_metrics_for_account(account):
@@ -44,9 +50,10 @@ def get_open_past_due_counts(account, start_date):
     rtn['all'] = all_this_year.count()
 
     # get inspection items that are past due
-    items = InspectionItem.objects.filter(account=account).filter(is_deleted=False)
-    items_this_year = items.filter(next_inspection_date__gte=start_date)
-    opd = items_this_year.filter(next_inspection_date__lt=datetime.now().date())
+    inspections = Inspection.objects.filter(account=account)\
+        .filter(completed_date__isnull=True)\
+        .filter(missed_inspection=False)
+    opd = inspections.filter(due_date__range=(start_date, datetime.now().date()))
     rtn['opd'] = opd.count()
 
     return rtn
@@ -54,8 +61,10 @@ def get_open_past_due_counts(account, start_date):
 
 def get_pending_next_30_days(account):
     today = datetime.now().date()
-    qs = InspectionItem.objects.filter(account=account).filter(is_active=True).filter(is_deleted=False)
-    today_or_greater = qs.filter(next_inspection_date__gte=today)
-    next_30_days = today_or_greater.filter(next_inspection_date__lte=today + timedelta(days=30))
+    qs = Inspection.objects.filter(account=account)\
+        .filter(missed_inspection=False)\
+        .filter(completed_date__isnull=True)
+    today_or_greater = qs.filter(due_date__gte=today)
+    next_30_days = today_or_greater.filter(due_date__lte=today + timedelta(days=30))
 
     return next_30_days.count()
