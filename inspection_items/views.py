@@ -12,7 +12,7 @@ from django_q.tasks import async_task
 from inspection_forms.models import InspectionForm
 from qr_codes.behaviors import QRCodeGeneratorMixin
 from .forms import InspectionItemForm, AddFormToItemForm
-from .models import InspectionItem
+from .models import InspectionItem, SubItem
 from .filters import InspectionItemsFilters
 from . import service
 
@@ -117,6 +117,11 @@ class InspectionItemDeleteView(LoginRequiredMixin, View):
         instance.save()
         return redirect(reverse_lazy('inspection_items:list'))
 
+class InspectionSubItemCreateView(LoginRequiredMixin, View):
+    model = SubItem
+
+    def get(self, request):
+        return render(request=request, template_name='dashboard/inspection_items/new_inspection_sub_item.html')
 
 def add_form_to_inspection_item(request, uuid):
     if request.POST:
@@ -130,3 +135,5 @@ def add_form_to_inspection_item(request, uuid):
 
 def clear_filters(request):
     return redirect('inspection_items:list')
+
+

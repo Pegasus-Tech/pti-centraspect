@@ -40,6 +40,7 @@ pytz==2021.3
 qrcode==7.3.1
 redis==3.5.3
 requests==2.27.1
+fontawesomefree==6.1.1
 ruamel.yaml==0.17.20
 ruamel.yaml.clib==0.2.6
 s3transfer==0.5.0

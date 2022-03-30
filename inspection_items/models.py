@@ -9,7 +9,7 @@ from centraspect.models import BaseModel
 from centraspect.utils import S3UploadType, S3UploadUtils
 from inspection_forms.models import InspectionForm
 from datetime import date
-from .utils import serialize_inspection_item
+from .utils import serialize_inspection_item, serialize_inspection_sub_item
 
 
 def qr_directory_path(instance, filename):
@@ -80,6 +80,7 @@ class InspectionItem(BaseModel):
     expiration_date = models.DateField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
+    is_kit = models.BooleanField(default=False)
     failed_inspection = models.BooleanField(default=False)
     
     form = models.ForeignKey(InspectionForm, on_delete=CASCADE, null=True, blank=True)
@@ -101,19 +102,36 @@ class InspectionItem(BaseModel):
         return date.today() == self.next_inspection_date
 
 
+class SubItem(BaseModel):
+    kit = models.ForeignKey(InspectionItem, on_delete=models.PROTECT, null=False)
+    title = models.CharField(max_length=500, blank=False, null=False)
+    serial_number = models.CharField(max_length=250, blank=True, null=True)
+    model_number = models.CharField(max_length=250, blank=True, null=True)
+    expiration_date = models.DateField(null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    is_deleted = models.BooleanField(default=False)
+    failed_inspection = models.BooleanField(default=False)
+    failure_reason = models.TextField(max_length=1000, blank=True, null=True)
+    qr_code = models.ImageField(upload_to=qr_directory_path, blank=True, null=True)
+
+
 @receiver(post_save, sender=InspectionItem)
 def generate_qr_code_callback(sender, instance, created, *args, **kwargs):
     if created:
         data = serialize_inspection_item(instance)
-        qr_code = S3UploadUtils.generate_qr_code_image(account=instance.account,
+        qr_code = S3UploadUtils.generate_qr_code_image(account=instance.kit.account,
                                                        instance_uuid=instance.uuid,
                                                        serialized_data=data)
         instance.qr_code = qr_code
         instance.save()
 
 
-@receiver(post_save, sender=InspectionItem)
-def generate_inspections(sender, instance, created, *args, **kwargs):
+@receiver(post_save, sender=SubItem)
+def generate_qr_code_callback(sender, instance, created, *args, **kwargs):
     if created:
-        pass
-    return None
+        data = serialize_inspection_sub_item(instance)
+        qr_code = S3UploadUtils.generate_qr_code_image(account=instance.account,
+                                                       instance_uuid=instance.uuid,
+                                                       serialized_data=data)
+        instance.qr_code = qr_code
+        instance.save()

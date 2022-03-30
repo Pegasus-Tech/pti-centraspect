@@ -4,7 +4,16 @@ import json
 def serialize_inspection_item(instance):
     return json.dumps(
         {
-            "uuid": instance.uuid.__str__(),
-            "form_uuid": instance.form.uuid.__str__() if instance.form is not None else None
+            "uuid": str(instance.uuid),
+            "form_uuid": str(instance.form.uuid) if instance.form is not None else None
+        }
+    )
+
+
+def serialize_inspection_sub_item(instance):
+    return json.dumps(
+        {
+            "uuid": str(instance.uuid),
+            "kit_uuid": str(instance.kit.uuid)
         }
     )

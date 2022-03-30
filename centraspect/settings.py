@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     'django_filters',
     'storages',
     'webpack_loader',
+    'fontawesomefree',
     'django_q',
     
     'authentication',

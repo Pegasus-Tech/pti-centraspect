@@ -35,23 +35,24 @@
         <button class="uk-offcanvas-close" type="button" uk-close></button>
 
         <ul class="uk-nav uk-nav-default">
-            <li  id="dashboard-nav-link"><a href="{% url 'dashboard' %}"><span class="uk-margin-small-right" uk-icon="icon: home"></span> Dashboard</a></li>
+            <li  id="dashboard-nav-link"><a href="{% url 'dashboard' %}"><span class="nav-icon"><i class="fa-solid fa-gauge"></i></span> Dashboard</a></li>
             <li class="uk-nav-divider"></li>
 
             <li class="uk-nav-header">Inspections</li>
 {#            <li id="inspection-schedule-nav-link"><a href="{% url 'inspection_calendar:calendar' %}"><span class="uk-margin-small-right" uk-icon="icon: calendar"></span> Inspection Schedule</a></li>#}
-            <li id="inspection-list-nav-link"><a href="{% url 'inspection_items:list' %}"><span class="uk-margin-small-right" uk-icon="icon: thumbnails"></span> Manage Equipment</a></li>
-            <li id="inspection-create-nav-link"><a href="{% url 'inspection_items:create' %}"><span class="uk-margin-small-right" uk-icon="icon: plus"></span> Add Equipment</a></li>
+            <li id="inspection-list-nav-link"><a href="{% url 'inspection_items:list' %}"><i class="fa-solid fa-screwdriver-wrench nav-icon"></i> Manage Equipment</a></li>
+            <li id="inspection-create-nav-link"><a href="{% url 'inspection_items:create' %}"><i class="fa-solid fa-plus nav-icon"></i> New Equipment</a></li>
+            <li id="inspection-create-sub-item-nav-link"><a href="{% url 'inspection_items:create_sub_item' %}"><i class="fa-solid fa-toolbox nav-icon"></i> Build Kit</a></li>
 
             <li class="uk-nav-divider"></li>
 
             <li class="uk-nav-header">Inspection Forms</li>
-            <li id="forms-list-nav-link"><a href="{% url 'inspection_forms:list' %}"><span class="uk-margin-small-right" uk-icon="icon: thumbnails"></span> Manage Forms</a></li>
-            <li id="forms-create-nav-link"><a href="{% url 'inspection_forms:form_builder' %}"><span class="uk-margin-small-right" uk-icon="icon: plus"></span> Form Builder</a></li>
+            <li id="forms-list-nav-link"><a href="{% url 'inspection_forms:list' %}"><i class="fa-solid fa-bars-progress nav-icon"></i> Manage Forms</a></li>
+            <li id="forms-create-nav-link"><a href="{% url 'inspection_forms:form_builder' %}"><i class="fa-solid fa-list-check nav-icon"></i> Form Builder</a></li>
 
             <li class="uk-nav-divider"></li>
             <li class="uk-nav-header">Admin</li>
-            <li id="admin-users-nav-link"><a href="{% url 'users:all' %}"><span class="uk-margin-small-right" uk-icon="icon: users"></span> Users</a></li>
+            <li id="admin-users-nav-link"><a href="{% url 'users:all' %}"><i class="fa-solid fa-users-gear nav-icon"></i> Users</a></li>
 
 
         </ul>
@@ -73,7 +74,11 @@
 
         else if(loc == '/dashboard/inspection-items/new') {
             document.getElementById('inspection-create-nav-link').classList.add('uk-active')
-        } 
+        }
+
+        else if(loc == '/dashboard/inspection-items/kit') {
+            document.getElementById('inspection-create-sub-item-nav-link').classList.add('uk-active')
+        }
         
         else if(loc == '/dashboard/form-builder/all') {
             document.getElementById('forms-list-nav-link').classList.add('uk-active')
