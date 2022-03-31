@@ -121,7 +121,13 @@ class InspectionSubItemCreateView(LoginRequiredMixin, View):
     model = SubItem
 
     def get(self, request):
-        return render(request=request, template_name='dashboard/inspection_items/new_inspection_sub_item.html')
+        form = InspectionItemForm()
+        form.fields['assigned_to'].queryset = self.request.user.account.user_set.all().filter(is_active=True)
+        form.fields['form'].queryset = InspectionForm.objects.get_all_active_for_account(account=self.request.user.account)
+
+        return render(request=request,
+                      template_name='dashboard/inspection_items/new_inspection_kit.html',
+                      context={"form": form})
 
 def add_form_to_inspection_item(request, uuid):
     if request.POST:
