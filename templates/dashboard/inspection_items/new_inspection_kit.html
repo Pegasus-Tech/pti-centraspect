@@ -4,29 +4,34 @@
     <div class="uk-container-small uk-align-center uk-margin-medium-top uk-margin-medium-bottom">
 
         <div class="uk-card uk-card-default">
-            <form class="uk-form-stacked" action="{% url 'inspection_items:create' %}" method="post">
+            <form id="new-kit-form" class="uk-form-stacked" action="{% url 'inspection_items:create' %}" method="post">
                 {% csrf_token %}
                 <div class="uk-card-header">
                     <h1>New Equipment Kit</h1>
                 </div>
 
                 <div class="uk-card-body">
-                    <div uk-grid>
+
+                    <ul uk-accordion>
+                        <li class="uk-open">
+                            <a href="#" class="uk-accordion-title">Kit Details</a>
+                            <div class="uk-accordion-content">
+                                <div uk-grid>
                         <div class="uk-width-1-2 uk-margin">
                             <label  class="uk-form-label">Kit Name<span style="color:red">*</span></label>
                             {{form.title}}
                         </div>
-                        
+
                         <div class="uk-width-1-2">
                             <label  class="uk-form-label">Kit Description</label>
                             {{form.description}}
                         </div>
-        
+
                         <div class="uk-width-1-2 uk-margin">
                             <label  class="uk-form-label">Kit Serial Number</label>
                             {{form.serial_number}}
                         </div>
-        
+
                         <div class="uk-width-1-2 uk-margin">
                             <label  class="uk-form-label">Kit Model Number</label>
                             {{form.model_number}}
@@ -46,23 +51,28 @@
                             <label  class="uk-form-label">Inspection Form</label>
                             {{form.form}}
                         </div>
-        
+
                         <div class="uk-width-1-2 uk-margin">
                             <label  class="uk-form-label">Inspection Interval<span style="color:red">*</span></label>
                             {{form.inspection_interval}}
                         </div>
-                        
+
                         <div class="uk-width-1-2 uk-margin">
                             <label  class="uk-form-label">Next Kit Inspection Due Date<span style="color:red">*</span></label>
                             {{form.next_inspection_date}}
                         </div>
-                        
+
                         <div class="uk-width-1-2 uk-margin">
                             <label  class="uk-form-label">Kit Expiration Date</label>
                             {{form.expiration_date}}
                         </div>
 
                     </div>
+                            </div>
+                        </li>
+                    </ul>
+
+
                 </div>
 
                 <div class="uk-card-footer">
@@ -71,7 +81,7 @@
                             <a href="#" class="uk-accordion-title">Kit Components</a>
                             <div class="uk-accordion-content">
                                 <a href="#new-component-modal" class="uk-button uk-button-link" uk-toggle>+ Add Component</a>
-                                <table class="uk-table uk-table-striped">
+                                <table id="sub-item-table" class="uk-table uk-table-striped">
                                     <thead>
                                         <tr>
                                             <th>Name</th>

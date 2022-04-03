@@ -1,7 +1,9 @@
 import json
 from typing import Any, Dict, Union
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, CreateView, DetailView
@@ -11,7 +13,7 @@ from django_q.tasks import async_task
 
 from inspection_forms.models import InspectionForm
 from qr_codes.behaviors import QRCodeGeneratorMixin
-from .forms import InspectionItemForm, AddFormToItemForm
+from .forms import InspectionItemForm, AddFormToItemForm, SubComponentForm, SubComponentFailureReasonForm
 from .models import InspectionItem, SubItem
 from .filters import InspectionItemsFilters
 from . import service
@@ -77,6 +79,8 @@ class InspectionItemDetailView(LoginRequiredMixin, DetailView):
         context['inspections'] = service.get_all_completed_inspections_for_item(self.get_object())
         context['closure_rate'] = service.get_completion_rate_for_item(self.get_object())
         context['forms'] = InspectionForm.objects.get_all_active_for_account(self.request.user.account)
+        if self.get_object().is_kit:
+            context['components'] = service.get_all_components_for_kit(kit=self.get_object())
         return context
 
 
@@ -117,6 +121,7 @@ class InspectionItemDeleteView(LoginRequiredMixin, View):
         instance.save()
         return redirect(reverse_lazy('inspection_items:list'))
 
+
 class InspectionSubItemCreateView(LoginRequiredMixin, View):
     model = SubItem
 
@@ -129,6 +134,119 @@ class InspectionSubItemCreateView(LoginRequiredMixin, View):
                       template_name='dashboard/inspection_items/new_inspection_kit.html',
                       context={"form": form})
 
+    def post(self, request, **kwargs):
+        data = json.loads(request.body)
+        print(f'Kit Request Data :: {data}')
+        try:
+            form_id = data['form'] if data['form'] != '' else None
+            assigned_to_id = data['assigned_to'] if data['assigned_to'] != '' else None
+            expiration_date = data['expiration_date'] if data['expiration_date'] else None
+            item = InspectionItem.objects.create(title=data['title'],
+                                                 is_kit=True,
+                                                 account=request.user.account,
+                                                 description=data['description'],
+                                                 serial_number=data['serial_number'],
+                                                 model_number=data['model_number'],
+                                                 inspection_type=data['inspection_type'],
+                                                 inspection_interval=data['inspection_interval'],
+                                                 assigned_to_id=assigned_to_id,
+                                                 form_id=form_id,
+                                                 next_inspection_date=data['next_inspection_date'],
+                                                 expiration_date=expiration_date)
+
+            print(f'created it {item}')
+            sub_items = data['subItems']
+
+            for sub_item in sub_items:
+                expiration = sub_item['expiration_date'] if sub_item['expiration_date'] else None
+                SubItem.objects.create(kit=item,
+                                       title=sub_item['name'],
+                                       serial_number=sub_item['serial_number'],
+                                       model_number=sub_item['model_number'],
+                                       expiration_date=expiration)
+            messages.success(request, f"Success! A new kit was created.")
+            return JsonResponse(status=200, data={"item_uuid": str(item.uuid)})
+
+        except Exception as e:
+            print(e)
+            return JsonResponse(status=500, data={"error": str(e)})
+
+
+@login_required
+def add_component_to_kit(request, uuid):
+    if request.POST:
+        kit = get_object_or_404(InspectionItem, uuid=uuid)
+        form = SubComponentForm(request.POST)
+        if form.is_valid():
+            comp = form.save(commit=False)
+            comp.kit = kit
+
+            try:
+                comp.save()
+                messages.success(request, f"Added {comp.title} to Kit: {kit.title}")
+                return redirect('inspection_items:details', uuid=uuid)
+            except Exception as e:
+                print("ERROR ADDING COMPONENT TO KIT", e)
+                return JsonResponse(status=400, data={"error_message": "Error adding component to kit"})
+        else:
+            return JsonResponse(status=400, data={"error_message": "Invalid Form Submitted"})
+
+
+@login_required
+def edit_component(request, uuid):
+    if request.POST:
+        component = get_object_or_404(SubItem, uuid=uuid)
+        form = SubComponentForm(request.POST)
+        if form.is_valid():
+            component.title = form.cleaned_data['title']
+            component.serial_number = form.cleaned_data['serial_number']
+            component.model_number = form.cleaned_data['model_number']
+            component.expiration_date = form.cleaned_data['expiration_date']
+            component.save()
+            messages.success(request, f"Successfully updated {component.title}")
+            return redirect('inspection_items:details', uuid=component.kit.uuid)
+        else:
+            messages.error(request, f"Unexpected error occurred updated {component.title}")
+            return redirect('inspection_items:details', uuid=component.kit.uuid)
+
+
+@login_required
+def delete_component(request, uuid):
+    print(f"IN DELETE METHOD FOR UUID :: {uuid}")
+    if request.POST:
+        component = get_object_or_404(SubItem, uuid=uuid)
+        component.is_deleted = True
+        component.is_active = False
+        try:
+            component.save()
+            messages.success(request, f"{component.title} successfully removed from kit {component.kit.title}")
+            return redirect('inspection_items:details', uuid=component.kit.uuid)
+        except Exception as e:
+            print('ERROR: Error deleting component ', e)
+            messages.error(request, f"Unexpected error occurred trying to delete component {component.title}")
+            return redirect('inspection_items:details', uuid=component.kit.uuid)
+
+
+@login_required
+def mark_component_failed(request, uuid):
+    if request.POST:
+        component = get_object_or_404(SubItem, uuid=uuid)
+        form = SubComponentFailureReasonForm(request.POST)
+        if form.is_valid():
+            component.failed_inspection = True
+            component.is_active = False
+            component.failure_reason = form.cleaned_data['failure_reason']
+            try:
+                component.save()
+                messages.warning(request, f"{component.title} permanently marked as failed/defective")
+                return redirect('inspection_items:details', uuid=component.kit.uuid)
+            except Exception as e:
+                print('ERROR: Error marking component failed/defective ', e)
+                messages.error(request, f"Unexpected error occurred trying to mark component {component.title} failed/defective")
+                return redirect('inspection_items:details', uuid=component.kit.uuid)
+
+
+@login_required
 def add_form_to_inspection_item(request, uuid):
     if request.POST:
         inspection_item = get_object_or_404(InspectionItem, uuid=uuid)
@@ -139,6 +257,7 @@ def add_form_to_inspection_item(request, uuid):
     return redirect('inspection_items:details', uuid=uuid)
 
 
+@login_required
 def clear_filters(request):
     return redirect('inspection_items:list')
 
