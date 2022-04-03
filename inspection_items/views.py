@@ -165,6 +165,7 @@ class InspectionSubItemCreateView(LoginRequiredMixin, View):
                                        model_number=sub_item['model_number'],
                                        expiration_date=expiration)
             messages.success(request, f"Success! A new kit was created.")
+            async_task('task_worker.service.build_future_inspections', item)
             return JsonResponse(status=200, data={"item_uuid": str(item.uuid)})
 
         except Exception as e:
