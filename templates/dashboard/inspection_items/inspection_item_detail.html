@@ -1,6 +1,30 @@
 {% extends '../../layouts/base.html' %}
 
 {% block body %}
+    {% if messages %}
+        {% for msg in messages %}
+            {% if msg.level_tag == 'error' %}
+                <div class="uk-alert-danger uk-margin-top" uk-alert>
+                    <a class="uk-alert-close" uk-close></a>
+                    <p>{{msg}}</p>
+                </div>
+            {% elif msg.level_tag == 'success' %}
+                <div class="uk-alert-success uk-margin-top" uk-alert>
+                    <a class="uk-alert-close" uk-close></a>
+                    <p>{{msg}}</p>
+                </div>
+
+            {% elif msg.level_tag == 'warning' %}
+                <div class="uk-alert-warning uk-margin-top" uk-alert>
+                    <a class="uk-alert-close" uk-close></a>
+                    <p>{{msg}}</p>
+                </div>
+            {% endif %}
+
+        {% endfor %}
+
+    {% endif %}
+
     <ul class="uk-margin-large-bottom uk-margin-top uk-subnav uk-breadcrumb">
         <li><a href="{% url 'inspection_items:list' %}">Manage Equipment</a></li>
         <li class="uk-disabled"><a>{{object.title}}</a></li>
@@ -45,38 +69,225 @@
                 </div>
 
                 <div class="uk-width-1-1 uk-margin-medium-top">
-                    <h4 class="uk-text-muted">Inspection Log</h4>
+                {% if object.is_kit %}
+                    <ul uk-tab>
+                        <li class="uk-active"><a href="">Components</a></li>
+                        <li><a href="">Inspection Log</a></li>
+                    </ul>
+                    <ul class="uk-switcher uk-margin">
+                        <li>
+                            <div uk-grid>
+                                <div class="uk-width-1-2">
+                                    <h4 class="uk-text-muted">Kit Components</h4>
+                                </div>
+
+                                 <div class="uk-width-1-2" align="right">
+                                    <a href="#add-component-modal" class="uk-button uk-button-primary"  uk-toggle>
+                                        <i class="fa-solid fa-plus"></i> Add Component
+                                    </a>
+                                </div>
+                            </div>
+
+                            <table class="uk-table uk-table-divider">
+                                <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Serial Number</th>
+                                    <th>Model Number</th>
+                                    <th>Expiration Date</th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for comp in components %}
+                                    <tr>
+                                        <td>{{ comp.title|default_if_none:"--" }}</td>
+                                        <td>{{ comp.serial_number|default_if_none:"--" }}</td>
+                                        <td>{{ comp.model_number|default_if_none:"--" }}</td>
+                                        <td>
+                                            {{ comp.expiration_date|date }}
+                                        </td>
+                                        <td>
+                                            <a href="#edit-component-modal-{{ comp.uuid }}" uk-toggle class="uk-link-text uk-margin-small-right" uk-tooltip="title: Edit Component">
+                                               <i class="fa-solid fa-pen-to-square"></i>
+                                            </a>
+                                            <a href="#delete-component-modal-{{ comp.uuid }}" uk-toggle class="uk-link-text uk-margin-small-right" uk-tooltip="title: Delete From Kit">
+                                               <i class="fa-solid fa-trash"></i>
+                                            </a>
+                                            <a href="#mark-component-failed-modal-{{ comp.uuid }}" uk-toggle class="uk-link-text" uk-tooltip="title: Mark As Failed/Defective">
+                                                <i class="fa-solid fa-flag"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+
+                                     <div id="edit-component-modal-{{ comp.uuid }}" uk-modal>
+                                        <div class="uk-modal-dialog uk-modal-body">
+                                            <h2 class="uk-modal-title">Edit Component - {{ comp.title }}</h2>
+                                            <form action="{% url 'inspection_items:edit_component' uuid=comp.uuid %}" method="post" id="edd-component-form">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="kit_uuid" value="{{ comp.uuid }}">
+                                                <label class="uk-margin-top" for="">Name<span style="color:red">*</span></label>
+                                                <input name="title" type="text" class="uk-input" required="true" value="{{ comp.title }}">
+
+                                                <label class="uk-margin-top" for="">Serial/Lot Number</label>
+                                                <input name="serial_number" type="text" class="uk-input" value="{{ comp.serial_number }}">
+
+                                                <label class="uk-margin-top" for="">Model Number</label>
+                                                <input name="model_number" type="text" class="uk-input" value="{{ comp.model_number }}">
+
+                                                <label class="uk-margin-top" for="">Expiration Date</label>
+                                                <input name="expiration_date" type="date" class="uk-input" value="{{ comp.expiration_date|date:"Y-m-d" }}">
+                                                <p class="uk-text-right uk-margin-top">
+                                                    <button class="uk-button uk-button-default uk-modal-close" type="button">Cancel</button>
+                                                    <button class="uk-button uk-button-primary" type="submit">Update</button>
+                                                </p>
+                                            </form>
+
+                                        </div>
+                                    </div>
+
+                                    <div id="delete-component-modal-{{ comp.uuid }}" uk-modal>
+                                        <div class="uk-modal-dialog">
+                                            <button class="uk-modal-close-default" type="button" uk-close></button>
+                                            <div class="uk-modal-header">
+                                                <h2 class="uk-modal-title">Delete {{ comp.title }}</h2>
+                                            </div>
+                                            <div class="uk-modal-body">
+                                                <h4>Are you sure?</h4>
+                                                <p>Deleting a component from a kit is a permanent action that cannot be reverted.<br/>
+                                                Would you like to continue?</p>
+                                            </div>
+                                            <div class="uk-modal-footer uk-text-right">
+                                                <form action="{% url 'inspection_items:delete_sub_item' uuid=comp.uuid %}" method="post">
+                                                    {% csrf_token %}
+                                                    <button class="uk-button uk-button-default uk-modal-close" type="button">Cancel</button>
+                                                    <button class="uk-button uk-button-primary" type="submit">Confirm Delete</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div id="mark-component-failed-modal-{{ comp.uuid }}" uk-modal>
+                                        <div class="uk-modal-dialog">
+                                            <button class="uk-modal-close-default" type="button" uk-close></button>
+                                            <div class="uk-modal-header">
+                                                <h2 class="uk-modal-title">Mark {{ comp.title }} Failed/Defective</h2>
+                                            </div>
+                                            <form action="{% url 'inspection_items:mark_sub_item_failed' uuid=comp.uuid %}" method="post">
+                                                {% csrf_token %}
+                                                <div class="uk-modal-body">
+                                                    <label for="failure-reason-{{ comp.uuid }}">Why is the component being marked failed/defective?</label>
+                                                    <textarea class="uk-textarea" name="failure_reason" id="failure-reason-{{ comp.uuid }}" maxlength="1000"
+                                                              cols="30" rows="10" placeholder="Provide some details to explain the nature of the equipment failure or what is defective."></textarea>
+                                                </div>
+                                                <div class="uk-modal-footer uk-text-right">
+                                                    <button class="uk-button uk-button-default uk-modal-close" type="button">Cancel</button>
+                                                    <button class="uk-button uk-button-primary" type="submit">Submit</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        </li>
+                        <li>
+                            <div uk-grid>
+                                <div class="uk-width-1-2">
+                                    <h4 class="uk-text-muted">Inspection Log</h4>
+                                </div>
+                                <div class="uk-width-1-2 uk-text-right">
+                                    {% if object.failed_inspection %}
+                                        <button class="uk-button uk-button-primary" disabled >Log New Inspection</button>
+                                    {% elif object.form is None %}
+                                        <a href="#log-inspection-modal" class="uk-button uk-button-primary" uk-toggle>Select Form</a>
+                                    {% else %}
+                                        <a href="{% url 'inspections:create' uuid=object.uuid %}" class="uk-button uk-button-primary">Log New Inspection</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <table class="uk-table uk-table-divider">
+                                <thead>
+                                <tr>
+                                    <th>Completed Date</th>
+                                    <th>Inspector</th>
+                                    <th>On Time Completion</th>
+                                    <th>Disposition</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for inspection in inspections %}
+                                    <tr>
+                                        <td>{{ inspection.completed_date|date }}</td>
+                                        <td>{{ inspection.completed_by.get_full_name }}</td>
+
+                                        {% if inspection.completed_past_due %}
+                                            <td class="uk-text-danger">NO</td>
+                                        {% else %}
+                                            <td class="uk-text-success">YES</td>
+                                        {% endif %}
+
+                                        {% if inspection.failed_inspection %}
+                                            <td class="uk-text-danger">Failed</td>
+                                        {% else %}
+                                            <td class="uk-text-success">Passed</td>
+                                        {% endif %}
+
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        </li>
+                    </ul>
+                {% else %}
+                    <div uk-grid>
+                        <div class="uk-width-1-2">
+                            <h4 class="uk-text-muted">Inspection Log</h4>
+                        </div>
+                        <div class="uk-width-1-2 uk-text-right">
+                            {% if object.failed_inspection %}
+                                <button class="uk-button uk-button-primary" disabled >Log New Inspection</button>
+                            {% elif object.form is None %}
+                                <a href="#log-inspection-modal" class="uk-button uk-button-primary" uk-toggle>Select Form</a>
+                            {% else %}
+                                <a href="{% url 'inspections:create' uuid=object.uuid %}" class="uk-button uk-button-primary">Log New Inspection</a>
+                            {% endif %}
+                        </div>
+                    </div>
+
                     <table class="uk-table uk-table-divider">
-                        <thead>
-                        <tr>
-                            <th>Completed Date</th>
-                            <th>Inspector</th>
-                            <th>On Time Completion</th>
-                            <th>Disposition</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for inspection in inspections %}
+                            <thead>
                             <tr>
-                                <td>{{ inspection.completed_date|date }}</td>
-                                <td>{{ inspection.completed_by.get_full_name }}</td>
-
-                                {% if inspection.completed_past_due %}
-                                    <td class="uk-text-danger"><span uk-icon="close"></span></td>
-                                {% else %}
-                                    <td class="uk-text-success"><span uk-icon="check"></span></td>
-                                {% endif %}
-
-                                {% if inspection.failed_inspection %}
-                                    <td class="uk-text-danger">Failed</td>
-                                {% else %}
-                                    <td class="uk-text-success">Passed</td>
-                                {% endif %}
-
+                                <th>Completed Date</th>
+                                <th>Inspector</th>
+                                <th>On Time Completion</th>
+                                <th>Disposition</th>
                             </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                            {% for inspection in inspections %}
+                                <tr>
+                                    <td>{{ inspection.completed_date|date }}</td>
+                                    <td>{{ inspection.completed_by.get_full_name }}</td>
+
+                                    {% if inspection.completed_past_due %}
+                                            <td class="uk-text-danger">NO</td>
+                                        {% else %}
+                                            <td class="uk-text-success">YES</td>
+                                        {% endif %}
+
+                                    {% if inspection.failed_inspection %}
+                                        <td class="uk-text-danger">Failed</td>
+                                    {% else %}
+                                        <td class="uk-text-success">Passed</td>
+                                    {% endif %}
+
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                {% endif %}
+
                 </div>
             </div>
 
@@ -100,16 +311,15 @@
                             </div>
                             <div class="uk-card-body">
                                 <h3 class="uk-card-title">
-                                    {{object.title|capfirst}}
+                                    {{object.title|capfirst}} &nbsp;
+                                    <small>
+                                        <a href="{% url 'inspection_items:update' uuid=object.uuid %}" class="uk-link-text">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                     </a>
+                                    </small>
                                 </h3>
                                 <p>{{object.description}}</p>
-                                {% if object.failed_inspection %}
-                                    <button class="uk-button uk-button-primary uk-margin-top" disabled >Log New Inspection</button>
-                                {% elif object.form is None %}
-                                    <a href="#log-inspection-modal" class="uk-button uk-button-primary uk-width-1-1 uk-margin-top" uk-toggle>Select Form</a>
-                                {% else %}
-                                    <a href="{% url 'inspections:create' uuid=object.uuid %}" class="uk-button uk-button-primary uk-width-1-1 uk-margin-top" uk-toggle>Log New Inspection</a>
-                                {% endif %}
+
                                 <hr/>
 
                                 <div uk-grid>
@@ -163,6 +373,32 @@
 
 
 
+        </div>
+
+        <div id="add-component-modal" uk-modal>
+            <div class="uk-modal-dialog uk-modal-body">
+                <h2 class="uk-modal-title">Add Component - {{ object.title }}</h2>
+                <form action="{% url 'inspection_items:add_component_to_kit' uuid=object.uuid %}" method="post" id="add-component-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="kit_uuid" value="{{ object.uuid }}">
+                    <label class="uk-margin-top" for="">Name<span style="color:red">*</span></label>
+                    <input name="title" type="text" class="uk-input" required="true">
+
+                    <label class="uk-margin-top" for="">Serial/Lot Number</label>
+                    <input name="serial_number" type="text" class="uk-input">
+
+                    <label class="uk-margin-top" for="">Model Number</label>
+                    <input name="model_number" type="text" class="uk-input">
+
+                    <label class="uk-margin-top" for="">Expiration Date</label>
+                    <input name="expiration_date" type="date" class="uk-input">
+                    <p class="uk-text-right uk-margin-top">
+                        <button class="uk-button uk-button-default uk-modal-close" type="button">Cancel</button>
+                        <button class="uk-button uk-button-primary" type="submit">Add</button>
+                    </p>
+                </form>
+
+            </div>
         </div>
 
         <div id="log-inspection-modal" uk-modal>

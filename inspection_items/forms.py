@@ -4,7 +4,7 @@ from django.forms import fields
 from authentication.models import User, Account
 from inspection_forms.models import InspectionForm
 
-from .models import InspectionInterval, InspectionItem, InspectionType
+from .models import InspectionInterval, InspectionItem, InspectionType, SubItem
 
 
 class InspectionItemForm(forms.ModelForm):
@@ -50,3 +50,22 @@ class AddFormToItemForm(forms.ModelForm):
     class Meta:
         model = InspectionItem
         fields = ['form', ]
+
+
+class SubComponentForm(forms.ModelForm):
+    title = forms.Field(required=True, widget=forms.TextInput)
+    model_number = forms.Field(required=False, widget=forms.TextInput)
+    serial_number = forms.Field(required=False, widget=forms.TextInput)
+    expiration_date = forms.DateField(required=False, widget=forms.TextInput)
+
+    class Meta:
+        model = SubItem
+        fields = ['title', 'model_number', 'serial_number', 'expiration_date']
+
+
+class SubComponentFailureReasonForm(forms.ModelForm):
+    failure_reason = forms.CharField(required=True, widget=forms.Textarea)
+
+    class Meta:
+        model = SubItem
+        fields = ['failure_reason', ]

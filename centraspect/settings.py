@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     'webpack_loader',
     'fontawesomefree',
     'django_q',
+    'django_htmx',
     
     'authentication',
     'dashboard',
@@ -93,6 +94,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_htmx.middleware.HtmxMiddleware'
 ]
 
 REST_FRAMEWORK = {

@@ -2,7 +2,7 @@ import json
 from typing import Iterable, Any
 from django.db.models import QuerySet
 from django.http.request import QueryDict
-from .models import InspectionItem
+from .models import InspectionItem, SubItem
 from inspections.models import Inspection
 from authentication.models import Account, User
 
@@ -84,3 +84,9 @@ def get_all_items_assigned_to_user(*, user: User) -> QuerySet:
         return qs.filter(assigned_to=user)
     else:
         raise ValueError(f"User cannot be None type")
+
+
+def get_all_components_for_kit(*, kit: InspectionItem) -> QuerySet:
+    qs = SubItem.objects.get_all_active_for_kit(kit=kit)
+    qs = qs.order_by('date_created')
+    return qs

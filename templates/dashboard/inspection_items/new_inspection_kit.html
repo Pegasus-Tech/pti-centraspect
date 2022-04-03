@@ -1,0 +1,147 @@
+{% extends '../../layouts/base.html' %}
+
+{% block body %}
+    <div class="uk-container-small uk-align-center uk-margin-medium-top uk-margin-medium-bottom">
+
+        <div class="uk-card uk-card-default">
+            <form id="new-kit-form" class="uk-form-stacked" action="{% url 'inspection_items:create' %}" method="post">
+                {% csrf_token %}
+                <div class="uk-card-header">
+                    <h1>New Equipment Kit</h1>
+                </div>
+
+                <div class="uk-card-body">
+
+                    <ul uk-accordion>
+                        <li class="uk-open">
+                            <a href="#" class="uk-accordion-title">Kit Details</a>
+                            <div class="uk-accordion-content">
+                                <div uk-grid>
+                        <div class="uk-width-1-2 uk-margin">
+                            <label  class="uk-form-label">Kit Name<span style="color:red">*</span></label>
+                            {{form.title}}
+                        </div>
+
+                        <div class="uk-width-1-2">
+                            <label  class="uk-form-label">Kit Description</label>
+                            {{form.description}}
+                        </div>
+
+                        <div class="uk-width-1-2 uk-margin">
+                            <label  class="uk-form-label">Kit Serial Number</label>
+                            {{form.serial_number}}
+                        </div>
+
+                        <div class="uk-width-1-2 uk-margin">
+                            <label  class="uk-form-label">Kit Model Number</label>
+                            {{form.model_number}}
+                        </div>
+
+                        <div class="uk-width-1-2 uk-margin">
+                            <label  class="uk-form-label">Equipment Category<span style="color:red">*</span></label>
+                            {{form.inspection_type}}
+                        </div>
+
+                        <div class="uk-width-1-2 uk-margin">
+                            <label  class="uk-form-label">Assigned/Belongs To</label>
+                            {{form.assigned_to}}
+                        </div>
+
+                        <div class="uk-width-1-2 uk-margin">
+                            <label  class="uk-form-label">Inspection Form</label>
+                            {{form.form}}
+                        </div>
+
+                        <div class="uk-width-1-2 uk-margin">
+                            <label  class="uk-form-label">Inspection Interval<span style="color:red">*</span></label>
+                            {{form.inspection_interval}}
+                        </div>
+
+                        <div class="uk-width-1-2 uk-margin">
+                            <label  class="uk-form-label">Next Kit Inspection Due Date<span style="color:red">*</span></label>
+                            {{form.next_inspection_date}}
+                        </div>
+
+                        <div class="uk-width-1-2 uk-margin">
+                            <label  class="uk-form-label">Kit Expiration Date</label>
+                            {{form.expiration_date}}
+                        </div>
+
+                    </div>
+                            </div>
+                        </li>
+                    </ul>
+
+
+                </div>
+
+                <div class="uk-card-footer">
+                    <ul uk-accordion>
+                        <li class="uk-open">
+                            <a href="#" class="uk-accordion-title">Kit Components</a>
+                            <div class="uk-accordion-content">
+                                <a href="#new-component-modal" class="uk-button uk-button-link" uk-toggle>+ Add Component</a>
+                                <table id="sub-item-table" class="uk-table uk-table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Serial/Lot #</th>
+                                            <th>Model #</th>
+                                            <th>Expiration</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="component-table-body">
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+
+                <div class="uk-card-footer">
+                    <div uk-grid>
+                        <div class="uk-width-1-2"></div>
+
+                        <div class="uk-width-1-2">
+                            <div class="uk-align-right">
+                                <a class="uk-button uk-button-danger" href="{% url 'inspection_items:list' %}">Cancel</a>
+                                <button type="submit" class="uk-button uk-button-primary">Create</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </form>
+        </div>
+
+
+        <div id="new-component-modal" uk-modal>
+            <div class="uk-modal-dialog uk-modal-body">
+                <h2 class="uk-modal-title">New Component</h2>
+                <form id="new-component-form">
+                    <label class="uk-margin-top" for="">Name<span style="color:red">*</span></label>
+                    <input name="component_name" type="text" class="uk-input" required="true">
+
+                    <label class="uk-margin-top" for="">Serial/Lot Number</label>
+                    <input name="component_serial_number" type="text" class="uk-input">
+
+                    <label class="uk-margin-top" for="">Model Number</label>
+                    <input name="component_model_number" type="text" class="uk-input">
+
+                    <label class="uk-margin-top" for="">Expiration Date</label>
+                    <input name="component_expiration" type="date" class="uk-input">
+                    <p class="uk-text-right uk-margin-top">
+                        <button class="uk-button uk-button-default uk-modal-close" type="button">Cancel</button>
+                        <button class="uk-button uk-button-primary" type="submit">Save</button>
+                    </p>
+                </form>
+
+            </div>
+        </div>
+    </div>
+    
+{% endblock body %}
+

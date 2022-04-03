@@ -87,7 +87,7 @@ class FormItemAPIView(LogInspectionMixin, APIView):
             disposition = data['disposition']
         except KeyError:
             print(f'No disposition attached to request')
-            return JsonResponse(data={"Error": "No disposition attached to request"}, status=400)
+            return JsonResponse(data={"error_message": "No disposition attached to request"}, status=400)
         finally:
 
             if filled_form is None or filled_form == '':
