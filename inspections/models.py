@@ -26,6 +26,14 @@ class InspectionManager(models.Manager):
         else:
             return self.get_queryset().none()
 
+    def get_all_active_for_account(self, account, *args, **kwargs):
+        if account is not None:
+            qs = self.get_queryset().all()
+            qs = qs.filter(account=account).filter(is_deleted=False)
+            return qs
+        else:
+            return self.get_queryset().none()
+
     def get_all_for_user(self, user, *args, **kwargs):
         if user is not None:
             qs = self.get_queryset().all()
@@ -52,7 +60,7 @@ class InspectionManager(models.Manager):
 
 
 class Inspection(BaseModel):
-    form = models.ForeignKey(InspectionForm, on_delete=models.PROTECT)
+    form = models.ForeignKey(InspectionForm, on_delete=models.PROTECT, null=True)
     item = models.ForeignKey(InspectionItem, on_delete=models.PROTECT)
     account = models.ForeignKey(Account, on_delete=models.PROTECT)
     json = models.JSONField(null=True, blank=True)
@@ -61,7 +69,8 @@ class Inspection(BaseModel):
     completed_date = models.DateTimeField(null=True)
     completed_past_due = models.BooleanField(null=True, default=False)
     missed_inspection = models.BooleanField(null=True, default=False)
-    failed_inspection = models.BooleanField(null=True)
+    failed_inspection = models.BooleanField(null=True, default=False)
+    is_deleted = models.BooleanField(null=True, default=False)
     objects = InspectionManager()
 
     def to_json(self):

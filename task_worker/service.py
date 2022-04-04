@@ -1,3 +1,5 @@
+from django.db.models import Q
+
 from inspection_items.models import InspectionItem
 from centraspect.utils import DateUtils
 from inspections.models import Inspection
@@ -26,6 +28,17 @@ def build_future_inspections(item: InspectionItem):
         inspection.save()
         next_due_date = DateUtils.increase_date_by_interval(next_due_date, item.inspection_interval)
         print("done creating inspection...")
+
+
+def delete_unlogged_inspections(item: InspectionItem):
+    qs = Inspection.objects.get_all_for_item(item=item)
+    qs = qs.filter(completed_date__isnull=True)\
+        .filter(missed_inspection=False)\
+        .filter(Q(failed_inspection=False) | Q(failed_inspection__isnull=True))
+
+    for inspection in qs:
+        inspection.is_deleted = True
+        inspection.save()
 
 
 def cache_inspection_updates(inspection):

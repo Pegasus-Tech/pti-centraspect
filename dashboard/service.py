@@ -3,7 +3,7 @@ from inspections.models import Inspection
 
 
 def get_upcoming_inspections_for_account(account):
-    qs = Inspection.objects.get_all_for_account(account=account)
+    qs = Inspection.objects.get_all_active_for_account(account=account)
     return qs
 
 

@@ -18,6 +18,8 @@ from .models import InspectionItem, SubItem
 from .filters import InspectionItemsFilters
 from . import service
 
+from datetime import datetime
+
 
 class InspectionItemListView(LoginRequiredMixin, ListView):
     filter_set = None
@@ -119,6 +121,7 @@ class InspectionItemDeleteView(LoginRequiredMixin, View):
         instance.is_active = False
         instance.is_deleted = True
         instance.save()
+        async_task('task_worker.service.delete_unlogged_inspections', instance)
         return redirect(reverse_lazy('inspection_items:list'))
 
 
@@ -151,8 +154,8 @@ class InspectionSubItemCreateView(LoginRequiredMixin, View):
                                                  inspection_interval=data['inspection_interval'],
                                                  assigned_to_id=assigned_to_id,
                                                  form_id=form_id,
-                                                 next_inspection_date=data['next_inspection_date'],
-                                                 expiration_date=expiration_date)
+                                                 next_inspection_date=datetime.strptime(data['next_inspection_date'], '%Y-%m-%d'),
+                                                 expiration_date=datetime.strptime(expiration_date, '%Y-%m-%d'))
 
             print(f'created it {item}')
             sub_items = data['subItems']
