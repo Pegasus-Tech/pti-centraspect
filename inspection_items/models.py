@@ -104,6 +104,11 @@ class InspectionItem(BaseModel):
     def is_due_today(self):
         return date.today() == self.next_inspection_date
 
+    class Meta:
+        permissions = [
+            ('inspect_assigned_equipment', 'User can inspect their own equipment')
+        ]
+
 
 class SubItemManager(models.Manager):
     def get_all_active_for_kit(self, kit):
