@@ -56,7 +56,7 @@ def build_user_permissions(perms):
     group = Group.objects.get(name='User')
     for perm in perms:
         if perm.content_type.app_label in CUSTOM_MODELS:
-            if 'view' in perm.codename or 'assigned' in perm.codename:
+            if 'view' in perm.codename or 'add_inspectionimage' in perm.codename or 'assigned' in perm.codename:
                 USER_PERMS.append(perm)
 
     for vp in USER_PERMS:
