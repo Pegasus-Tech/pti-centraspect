@@ -9,6 +9,7 @@ from io import BytesIO
 import qrcode
 import os
 
+
 class QRCodeGeneratorMixin:
     
     def generate_qr_code(self, *args, **kwargs):
@@ -39,7 +40,6 @@ class QRCodeGeneratorMixin:
         qr.save()   
         
         return qr
-        
-            
+
     def _build_bucket_path(self, account):
         return f'qr_codes/{slugify(account.name)}-{account.uuid}/codes'

@@ -1,11 +1,16 @@
 {% extends '../../layouts/base.html' %}
+{% load auth_tags %}
 
 {% block body %}
     <ul class="uk-margin-large-bottom uk-margin-top uk-subnav uk-breadcrumb">
         <li><a href="{% url 'inspection_forms:list' %}">All Forms</a></li>
         <li class="uk-disabled"><a>{{object.title}}</a></li>
     </ul>
-    <h2>{{object.title}} <a href="{% url 'inspection_forms:edit' uuid=object.uuid %}" uk-icon="icon: pencil" uk-tooltip="Edit"></a></h2>
+    <h2>{{object.title}}
+        {% if user|has_group:'Account Admin' %}
+            <a href="{% url 'inspection_forms:edit' uuid=object.uuid %}" uk-icon="icon: pencil" uk-tooltip="Edit"></a>
+        {% endif %}
+    </h2>
     <hr class="uk-divider-icon"/>
     <div class="form-detail-container">
         <div class="fb-render">

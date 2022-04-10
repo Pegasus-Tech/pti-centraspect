@@ -1,4 +1,5 @@
 {% extends '../../layouts/base.html' %}
+{% load auth_tags %}
 
 {% block body %}
     {% if messages %}
@@ -82,9 +83,12 @@
                                 </div>
 
                                  <div class="uk-width-1-2" align="right">
-                                    <a href="#add-component-modal" class="uk-button uk-button-primary"  uk-toggle>
-                                        <i class="fa-solid fa-plus"></i> Add Component
-                                    </a>
+                                     {% if user|has_group:'Account Admin' or user|has_group:'Inspector' %}
+                                         <a href="#add-component-modal" class="uk-button uk-button-primary"  uk-toggle>
+                                            <i class="fa-solid fa-plus"></i> Add Component
+                                        </a>
+                                     {% endif %}
+
                                 </div>
                             </div>
 
@@ -108,15 +112,23 @@
                                             {{ comp.expiration_date|date }}
                                         </td>
                                         <td>
-                                            <a href="#edit-component-modal-{{ comp.uuid }}" uk-toggle class="uk-link-text uk-margin-small-right" uk-tooltip="title: Edit Component">
-                                               <i class="fa-solid fa-pen-to-square"></i>
-                                            </a>
-                                            <a href="#delete-component-modal-{{ comp.uuid }}" uk-toggle class="uk-link-text uk-margin-small-right" uk-tooltip="title: Delete From Kit">
-                                               <i class="fa-solid fa-trash"></i>
-                                            </a>
-                                            <a href="#mark-component-failed-modal-{{ comp.uuid }}" uk-toggle class="uk-link-text" uk-tooltip="title: Mark As Failed/Defective">
-                                                <i class="fa-solid fa-flag"></i>
-                                            </a>
+                                            {% if user|has_group:'Account Admin' or user|has_group:'Inspector' %}
+                                                <a href="#edit-component-modal-{{ comp.uuid }}" uk-toggle class="uk-link-text uk-margin-small-right" uk-tooltip="title: Edit Component">
+                                                   <i class="fa-solid fa-pen-to-square"></i>
+                                                </a>
+                                                <a href="#delete-component-modal-{{ comp.uuid }}" uk-toggle class="uk-link-text uk-margin-small-right" uk-tooltip="title: Delete From Kit">
+                                                   <i class="fa-solid fa-trash"></i>
+                                                </a>
+                                            {% endif %}
+                                            {% if user|has_group:'Account Admin' or user|has_group:'Inspector' %}
+                                                <a href="#mark-component-failed-modal-{{ comp.uuid }}" uk-toggle class="uk-link-text" uk-tooltip="title: Mark As Failed/Defective">
+                                                    <i class="fa-solid fa-flag"></i>
+                                                </a>
+                                            {% elif user|has_group:'User' and comp.kit.assigned_to == user %}
+                                                 <a href="#mark-component-failed-modal-{{ comp.uuid }}" uk-toggle class="uk-link-text" uk-tooltip="title: Mark As Failed/Defective">
+                                                    <i class="fa-solid fa-flag"></i>
+                                                </a>
+                                            {% endif %}
                                         </td>
                                     </tr>
 
@@ -197,12 +209,22 @@
                                     <h4 class="uk-text-muted">Inspection Log</h4>
                                 </div>
                                 <div class="uk-width-1-2 uk-text-right">
-                                    {% if object.failed_inspection %}
-                                        <button class="uk-button uk-button-primary" disabled >Log New Inspection</button>
-                                    {% elif object.form is None %}
-                                        <a href="#log-inspection-modal" class="uk-button uk-button-primary" uk-toggle>Select Form</a>
-                                    {% else %}
-                                        <a href="{% url 'inspections:create' uuid=object.uuid %}" class="uk-button uk-button-primary">Log New Inspection</a>
+                                    {% if user|has_group:'Account Admin' or user|has_group:'Inspector'%}
+                                        {% if object.failed_inspection %}
+                                            <button class="uk-button uk-button-primary" disabled >Log New Inspection</button>
+                                        {% elif object.form is None %}
+                                            <a href="#log-inspection-modal" class="uk-button uk-button-primary" uk-toggle>Select Form</a>
+                                        {% else %}
+                                            <a href="{% url 'inspections:create' uuid=object.uuid %}" class="uk-button uk-button-primary">Log New Inspection</a>
+                                        {% endif %}
+                                    {% elif user|has_group:'User' and object.assigned_to == user %}
+                                        {% if object.failed_inspection %}
+                                            <button class="uk-button uk-button-primary" disabled >Log New Inspection</button>
+                                        {% elif object.form is None %}
+                                            <a href="#log-inspection-modal" class="uk-button uk-button-primary" uk-toggle>Select Form</a>
+                                        {% else %}
+                                            <a href="{% url 'inspections:create' uuid=object.uuid %}" class="uk-button uk-button-primary">Log New Inspection</a>
+                                        {% endif %}
                                     {% endif %}
                                 </div>
                             </div>
@@ -245,12 +267,22 @@
                             <h4 class="uk-text-muted">Inspection Log</h4>
                         </div>
                         <div class="uk-width-1-2 uk-text-right">
-                            {% if object.failed_inspection %}
-                                <button class="uk-button uk-button-primary" disabled >Log New Inspection</button>
-                            {% elif object.form is None %}
-                                <a href="#log-inspection-modal" class="uk-button uk-button-primary" uk-toggle>Select Form</a>
-                            {% else %}
-                                <a href="{% url 'inspections:create' uuid=object.uuid %}" class="uk-button uk-button-primary">Log New Inspection</a>
+                            {% if user|has_group:'Account Admin' or user|has_group:'Inspector'%}
+                                {% if object.failed_inspection %}
+                                    <button class="uk-button uk-button-primary" disabled >Log New Inspection</button>
+                                {% elif object.form is None %}
+                                    <a href="#log-inspection-modal" class="uk-button uk-button-primary" uk-toggle>Select Form</a>
+                                {% else %}
+                                    <a href="{% url 'inspections:create' uuid=object.uuid %}" class="uk-button uk-button-primary">Log New Inspection</a>
+                                {% endif %}
+                            {% elif user|has_group:'User' and object.assigned_to == user %}
+                                {% if object.failed_inspection %}
+                                    <button class="uk-button uk-button-primary" disabled >Log New Inspection</button>
+                                {% elif object.form is None %}
+                                    <a href="#log-inspection-modal" class="uk-button uk-button-primary" uk-toggle>Select Form</a>
+                                {% else %}
+                                    <a href="{% url 'inspections:create' uuid=object.uuid %}" class="uk-button uk-button-primary">Log New Inspection</a>
+                                {% endif %}
                             {% endif %}
                         </div>
                     </div>
@@ -312,11 +344,14 @@
                             <div class="uk-card-body">
                                 <h3 class="uk-card-title">
                                     {{object.title|capfirst}} &nbsp;
-                                    <small>
-                                        <a href="{% url 'inspection_items:update' uuid=object.uuid %}" class="uk-link-text">
-                                        <i class="fa-solid fa-pen-to-square"></i>
-                                     </a>
-                                    </small>
+                                     {% if user|has_group:'Account Admin' or user|has_group:'Inspector' %}
+                                         <small>
+                                            <a href="{% url 'inspection_items:update' uuid=object.uuid %}" class="uk-link-text">
+                                                <i class="fa-solid fa-pen-to-square"></i>
+                                            </a>
+                                        </small>
+                                     {% endif %}
+
                                 </h3>
                                 <p>{{object.description}}</p>
 

@@ -56,6 +56,11 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 ALLOWED_HOSTS = ['*']
 
+ACCOUNT_ADMIN_GROUP = 'Account Admin'
+INSPECTOR_GROUP = 'Inspector'
+USER_GROUP = 'User'
+VIEWER_GROUP = 'Viewer'
+
 
 # Application definition
 

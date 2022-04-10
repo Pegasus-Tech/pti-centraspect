@@ -1,6 +1,7 @@
 {% extends '../../layouts/base.html' %}]
 {% load static %}
 {% load pagination_parameters %}
+{% load auth_tags %}
 {% load render_bundle from webpack_loader %}
 {% render_bundle 'equipment' %}
 
@@ -240,10 +241,16 @@
                     </td>
                     <td>
                         <a href="{{ item.get_absolute_url }}" uk-icon="icon: desktop" uk-tooltip="View"></a>
-                        <a href="{% url 'inspection_items:update' uuid=item.uuid %}" uk-icon="icon: pencil"
-                           uk-tooltip="Edit"></a>
-                        <a href="#delete-confirmation-{{ item.uuid }}" uk-toggle uk-icon="icon: ban"
-                           uk-tooltip="Delete"></a>
+                        {% if user|has_group:'Account Admin' or user|has_group:'Inspector' %}
+                            <a href="{% url 'inspection_items:update' uuid=item.uuid %}" uk-icon="icon: pencil"
+                               uk-tooltip="Edit"></a>
+                        {% endif %}
+
+                        {% if user|has_group:'Account Admin' %}
+                             <a href="#delete-confirmation-{{ item.uuid }}" uk-toggle uk-icon="icon: ban"
+                               uk-tooltip="Delete"></a>
+                        {% endif %}
+
                     </td>
                 </tr>
 

@@ -11,6 +11,8 @@ from django.views.generic.base import View
 from django.views.generic.edit import UpdateView
 from django_q.tasks import async_task
 
+from authentication.mixins import GroupRequiredMixin
+from centraspect import settings
 from inspection_forms.models import InspectionForm
 from qr_codes.behaviors import QRCodeGeneratorMixin
 from .forms import InspectionItemForm, AddFormToItemForm, SubComponentForm, SubComponentFailureReasonForm
@@ -48,13 +50,15 @@ class InspectionItemListView(LoginRequiredMixin, ListView):
         return redirect('inspection_items:list')
 
 
-class InspectionItemCreateView(LoginRequiredMixin, QRCodeGeneratorMixin, CreateView):
+class InspectionItemCreateView(GroupRequiredMixin, LoginRequiredMixin, QRCodeGeneratorMixin, CreateView):
+    group_names = [settings.ACCOUNT_ADMIN_GROUP, settings.INSPECTOR_GROUP]
     model = InspectionItem
     template_name = 'dashboard/inspection_items/new_inspection_item.html'
 
     def get_form(self, **kwargs: Any) -> InspectionItemForm:
         form_class = super().get_form(InspectionItemForm)
-        form_class.fields['assigned_to'].queryset = self.request.user.account.user_set.all().filter(is_active=True)
+        form_class.fields['assigned_to'].queryset = self.request.user.account.user_set.all().filter(is_active=True)\
+            .filter(groups__name__in=[settings.ACCOUNT_ADMIN_GROUP, settings.INSPECTOR_GROUP, settings.USER_GROUP])
         form_class.fields['form'].queryset = InspectionForm.objects.get_all_active_for_account(account=self.request.user.account)
         return form_class
 
@@ -86,7 +90,8 @@ class InspectionItemDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
-class InspectionItemUpdateView(LoginRequiredMixin, UpdateView):
+class InspectionItemUpdateView(GroupRequiredMixin, LoginRequiredMixin, UpdateView):
+    group_names = [settings.ACCOUNT_ADMIN_GROUP, settings.INSPECTOR_GROUP]
     model = InspectionItem
 
     def get(self, request, uuid, **kwargs: Any) -> HttpResponse:
@@ -113,7 +118,8 @@ class InspectionItemUpdateView(LoginRequiredMixin, UpdateView):
             return render(request=self.request, template_name='400.html', context={"error_msg": "error saving form"})
 
 
-class InspectionItemDeleteView(LoginRequiredMixin, View):
+class InspectionItemDeleteView(GroupRequiredMixin, LoginRequiredMixin, View):
+    group_names = [settings.ACCOUNT_ADMIN_GROUP, ]
     model = InspectionItem
 
     def get(self, request, uuid, **kwargs: Any) -> Union[HttpResponseRedirect, HttpResponsePermanentRedirect]:
@@ -125,7 +131,8 @@ class InspectionItemDeleteView(LoginRequiredMixin, View):
         return redirect(reverse_lazy('inspection_items:list'))
 
 
-class InspectionSubItemCreateView(LoginRequiredMixin, View):
+class InspectionSubItemCreateView(GroupRequiredMixin, LoginRequiredMixin, View):
+    group_names = [settings.ACCOUNT_ADMIN_GROUP, settings.INSPECTOR_GROUP]
     model = SubItem
 
     def get(self, request):

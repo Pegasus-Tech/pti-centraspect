@@ -1,4 +1,5 @@
 {% load static %}
+{% load auth_tags %}
 <nav class="uk-navbar-container" uk-navbar>
     <div class="uk-navbar-left uk-margin-left">
         <a class="uk-navbar-item uk-logo" href="/dashboard/">
@@ -41,18 +42,25 @@
             <li class="uk-nav-header">Inspections</li>
 {#            <li id="inspection-schedule-nav-link"><a href="{% url 'inspection_calendar:calendar' %}"><span class="uk-margin-small-right" uk-icon="icon: calendar"></span> Inspection Schedule</a></li>#}
             <li id="inspection-list-nav-link"><a href="{% url 'inspection_items:list' %}"><i class="fa-solid fa-screwdriver-wrench nav-icon"></i> Manage Equipment</a></li>
-            <li id="inspection-create-nav-link"><a href="{% url 'inspection_items:create' %}"><i class="fa-solid fa-plus nav-icon"></i> New Equipment</a></li>
-            <li id="inspection-create-sub-item-nav-link"><a href="{% url 'inspection_items:create_sub_item' %}"><i class="fa-solid fa-toolbox nav-icon"></i> Build Kit</a></li>
+            {% if user|has_group:'Account Admin' or user|has_group:'Inspector' %}
+                <li id="inspection-create-nav-link"><a href="{% url 'inspection_items:create' %}"><i class="fa-solid fa-plus nav-icon"></i> New Equipment</a></li>
+                <li id="inspection-create-sub-item-nav-link"><a href="{% url 'inspection_items:create_sub_item' %}"><i class="fa-solid fa-toolbox nav-icon"></i> Build Kit</a></li>
+            {% endif %}
 
             <li class="uk-nav-divider"></li>
-
+            
             <li class="uk-nav-header">Inspection Forms</li>
             <li id="forms-list-nav-link"><a href="{% url 'inspection_forms:list' %}"><i class="fa-solid fa-bars-progress nav-icon"></i> Manage Forms</a></li>
-            <li id="forms-create-nav-link"><a href="{% url 'inspection_forms:form_builder' %}"><i class="fa-solid fa-list-check nav-icon"></i> Form Builder</a></li>
+            {% if user|has_group:'Account Admin'%}
+                <li id="forms-create-nav-link"><a href="{% url 'inspection_forms:form_builder' %}"><i class="fa-solid fa-list-check nav-icon"></i> Form Builder</a></li>
+            {% endif %} 
 
-            <li class="uk-nav-divider"></li>
-            <li class="uk-nav-header">Admin</li>
-            <li id="admin-users-nav-link"><a href="{% url 'users:all' %}"><i class="fa-solid fa-users-gear nav-icon"></i> Users</a></li>
+
+            {% if user|has_group:'Account Admin' %}
+                <li class="uk-nav-divider"></li>
+                <li class="uk-nav-header">Admin</li>
+                <li id="admin-users-nav-link"><a href="{% url 'users:all' %}"><i class="fa-solid fa-users-gear nav-icon"></i> Users</a></li>
+            {% endif %}
 
 
         </ul>

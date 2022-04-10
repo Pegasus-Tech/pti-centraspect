@@ -1,4 +1,5 @@
 {% extends '../../layouts/base.html' %}
+{% load auth_tags %}
 
 {% block body %}
     <h1 class="uk-margin-top">{{user.account.name}} Forms</h1>
@@ -25,8 +26,11 @@
 
                             <a href="{{form.get_absolute_url}}" uk-icon="icon: desktop" uk-tooltip="Preview"></a>
                             {% comment %} <a href='#' uk-icon="icon: settings" uk-tooltip="Usage Stats"></a> {% endcomment %}
-                            <a href="{% url 'inspection_forms:edit' uuid=form.uuid %}" uk-icon="icon: pencil" uk-tooltip="Edit"></a>
-                            <a href="#delete-confirmation-{{form.uuid}}" uk-toggle uk-icon="icon: ban" uk-tooltip="Delete"></a>
+                            {% if user|has_group:'Account Admin' %}
+                                <a href="{% url 'inspection_forms:edit' uuid=form.uuid %}" uk-icon="icon: pencil" uk-tooltip="Edit"></a>
+                                <a href="#delete-confirmation-{{form.uuid}}" uk-toggle uk-icon="icon: ban" uk-tooltip="Delete"></a>
+                            {% endif %}
+
                         </td>
                     </tr>
 

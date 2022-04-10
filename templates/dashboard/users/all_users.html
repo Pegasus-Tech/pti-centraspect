@@ -1,5 +1,5 @@
 {% extends '../../layouts/base.html' %}
-
+{% load auth_tags %}
 {% block body %}
     {% if messages %}
         {% for msg in messages %}
@@ -51,12 +51,47 @@
                     <td>
                         <a href="{{ u.absolute_url }}" uk-icon="icon: desktop" uk-tooltip="View"></a>
 {#                        <a href="" uk-icon="icon: pencil" uk-tooltip="Edit {{u.get_full_name}}"></a>#}
-                        {% if u != user %}
+                        {% if user|has_group:'Account Admin' %}
                             <a href="#delete-confirmation-{{u.uuid}}" uk-toggle uk-icon="icon: ban" uk-tooltip="Deactivate {{u.get_full_name}}"></a>
+                            <a href="#edit-user-modal-{{u.uuid}}" uk-toggle uk-icon="icon: pencil" uk-tooltip="Edit {{u.get_full_name}}"></a>
                         {% endif %}
                         
                     </td>
                 </tr>
+
+                <div id="edit-user-modal-{{ u.uuid }}" uk-modal>
+                    <div class="uk-modal-dialog uk-modal-body">
+                        <h2 class="uk-modal-title">Edit User - {{ u.get_full_name }}</h2>
+                        <form action="{% url 'users:edit_user' uuid=u.uuid %}" method="post">
+                            {% csrf_token %}
+                            <label class="uk-margin-top" for="">First Name<span style="color:red">*</span></label>
+                            <input name="first_name" type="text" class="uk-input" required="true" value="{{ u.first_name }}">
+
+                            <label class="uk-margin-top" for="">Last Nmae</label>
+                            <input name="last_name" type="text" class="uk-input" value="{{ u.last_name }}">
+
+                            <label class="uk-margin-top" for="">Email</label>
+                            <input name="email" type="text" class="uk-input" value="{{ u.email }}">
+
+                            <label class="uk-margin-top" for="">Expiration Date</label>
+                            <select name="group" class="uk-select">
+                                {% for group in groups %}
+                                    {% if group.name == u.readable_role %}
+                                        <option value="{{ group.name }}" selected>{{ u.readable_role }}</option>
+                                    {% else %}
+                                         <option value="{{ group.name }}">{{ group.name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+
+                            </select>
+                            <p class="uk-text-right uk-margin-top">
+                                <button class="uk-button uk-button-default uk-modal-close" type="button">Cancel</button>
+                                <button class="uk-button uk-button-primary" type="submit">Update</button>
+                            </p>
+                        </form>
+
+                    </div>
+                </div>
 
                 <div id="delete-confirmation-{{u.uuid}}" uk-modal>
                     <div class="uk-modal-dialog">

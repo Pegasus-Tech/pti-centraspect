@@ -30,17 +30,9 @@ class Account(BaseModel):
         return f'[name: {self.name}, uuid: {self.uuid}, is_active: {self.is_active}]'
 
 
-class Roles(models.TextChoices):
-    USER = "base_user", _('User')
-    INSPECTOR = "inspector", _('Inspector')
-    ACCOUNT_ADMIN = "account_admin", _('Account Admin')
-    SYSTEM_ADMIN = "system_admin", _('Superuser')
-
-
 class User(AbstractUser, PermissionsMixin):
     uuid = models.UUIDField(default=uuid.uuid4)
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
-    role = models.CharField(max_length=250, choices=Roles.choices, default=0)
     is_active = models.BooleanField(default=True)
 
     def __str__(self) -> str:
@@ -56,11 +48,7 @@ class User(AbstractUser, PermissionsMixin):
 
     @property
     def readable_role(self) -> str:
-        lbl = ""
-        for role in Roles:
-            if role.value == self.role:
-                return role.label
-        return lbl
+        return self.groups.first().name if self.groups.exists() else ''
 
 
 class TokenManager(models.Manager):

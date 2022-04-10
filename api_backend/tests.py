@@ -3,7 +3,7 @@ import uuid
 from django.test import Client
 from django.test import TestCase
 
-from authentication.models import Account, User, Roles
+from authentication.models import Account, User
 from centraspect import messages
 from inspection_items.models import InspectionItem, InspectionInterval, InspectionType
 from inspection_forms.models import InspectionForm
@@ -20,7 +20,7 @@ class LogInspectionTestCase(TestCase):
         acct = Account.objects.create(name='Test Account')
         user = User.objects.create(first_name='Test', last_name='User', email='test@user.com',
                                    username='test@user.com', password='abadone', account=acct,
-                                   role=Roles.INSPECTOR)
+                                   )
         today = date.today()
         next_week = today + timedelta(days=7)
         form = InspectionForm.objects.create(title="Test Form",

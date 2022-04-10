@@ -6,13 +6,16 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import TemplateView, ListView, DetailView, View
 from django.urls import reverse, reverse_lazy
 
+from authentication.mixins import GroupRequiredMixin
+from centraspect import settings
 from .forms import InspectionFormForm
 from .models import InspectionForm
 
 import json
 
 
-class FormBuilderTemplateView(LoginRequiredMixin, TemplateView):
+class FormBuilderTemplateView(GroupRequiredMixin, LoginRequiredMixin, TemplateView):
+    group_names = [settings.ACCOUNT_ADMIN_GROUP, ]
     template_name = 'dashboard/form_builder/new_form.html'
     model = InspectionForm
 
@@ -42,7 +45,8 @@ class InspectionFormListView(LoginRequiredMixin, ListView):
         return context
 
 
-class InspectionFormUpdateView(LoginRequiredMixin, View):
+class InspectionFormUpdateView(GroupRequiredMixin, LoginRequiredMixin, View):
+    group_names = [settings.ACCOUNT_ADMIN_GROUP, ]
     model = InspectionForm
 
     def get(self, request, uuid):
@@ -67,7 +71,8 @@ class InspectionFormUpdateView(LoginRequiredMixin, View):
             return render(request=request, template_name='400.html', context={"error_msg": "error saving form"})
 
 
-class InspectionFormDeleteView(LoginRequiredMixin, View):
+class InspectionFormDeleteView(GroupRequiredMixin, LoginRequiredMixin, View):
+    group_names = [settings.ACCOUNT_ADMIN_GROUP, ]
     model = InspectionForm
 
     def get(self, request, uuid):

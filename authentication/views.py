@@ -1,3 +1,4 @@
+from django.contrib.auth.models import Group
 from django.shortcuts import redirect, render
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -5,7 +6,9 @@ from django.contrib import messages
 from django.views.generic import ListView, CreateView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from authentication.forms import AdminCreateUserForm
-from authentication.models import User, Account, Roles
+from authentication.mixins import GroupRequiredMixin
+from authentication.models import User, Account
+from centraspect import settings
 from inspection_items import service as equipment_service
 
 
@@ -24,10 +27,14 @@ def registration_view(request):
             username=request.POST.get('email'),
             email=request.POST.get('email'),
             first_name=request.POST.get('first_name'),
-            last_name=request.POST.get('last_name'),
-            role=Roles.ACCOUNT_ADMIN)
+            last_name=request.POST.get('last_name'))
         user.set_password(request.POST.get('password'))
         user.save()
+
+        group = Group.objects.filter(name='Account Admin')
+        if group.exists():
+            user.groups.add(group.get())
+            user.save()
         
         print(f'User :: [username: {user.username}, password: {user.password}]')
         
@@ -97,9 +104,33 @@ def user_detail_view(request, uuid):
             error = f'ERROR: No user found with UUID {uuid}'
             messages.error(request, error)
             return redirect('users:all')
-        
 
-class AccountUsersListView(LoginRequiredMixin, ListView):
+
+@login_required
+def edit_user_view(request, uuid):
+    if request.method == 'POST':
+        try:
+            form = AdminCreateUserForm(request.POST or None)
+            if form.is_valid():
+                user = User.objects.get(uuid=uuid)
+                user.first_name = form.cleaned_data['first_name']
+                user.last_name = form.cleaned_data['last_name']
+                user.email = form.cleaned_data['email']
+                user.username = form.cleaned_data['email']
+                user.groups.clear()
+                group = Group.objects.get(name=form.cleaned_data['group'])
+                user.groups.add(group)
+                user.save()
+                messages.success(request, f'Success! {user.get_full_name} was successfully updated.')
+                return redirect('users:all')
+        except Exception as e:
+            messages.error(request, "Error editing user. Please try again.")
+            print(f'ERROR: error editing user with exception :: ', e)
+            return redirect('users:all')
+
+
+class AccountUsersListView(GroupRequiredMixin, LoginRequiredMixin, ListView):
+    group_names = [settings.ACCOUNT_ADMIN_GROUP, ]
     template_name = 'dashboard/users/all_users.html'
     model = User
     
@@ -107,10 +138,12 @@ class AccountUsersListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["users"] = User.objects.filter(account=self.request.user.account).filter(is_active=True)
         context["new_user_form"] = AdminCreateUserForm(None)
+        context['groups'] = Group.objects.exclude(name='Superuser')
         return context
 
 
-class AccountCreateUserView(LoginRequiredMixin, CreateView):
+class AccountCreateUserView(GroupRequiredMixin, LoginRequiredMixin, CreateView):
+    group_names = [settings.ACCOUNT_ADMIN_GROUP, ]
     model = User
     
     def post(self, request):
@@ -122,10 +155,17 @@ class AccountCreateUserView(LoginRequiredMixin, CreateView):
             user.account = request.user.account
             try:
                 user.save()
+                user.groups.clear()
+                group = Group.objects.get(name=user_form.cleaned_data['group'])
+                user.groups.add(group)
+                user.save()
                 messages.success(request, f"Success! {user.get_full_name} was created.")
             except Exception as e:
                 print(f'Error Creating User :: {e}')
-                messages.error(request, f'Error: {e}')
+                if 'duplicate' in str(e):
+                    messages.error(request, f'Error: A user with email \"{user.email}\" already exists.')
+                else:
+                    messages.error(request, f'Error: {e}')
             finally:
                 return redirect("users:all")
         else:
@@ -134,7 +174,8 @@ class AccountCreateUserView(LoginRequiredMixin, CreateView):
             return redirect("users:all")
 
 
-class AccountUserDeactivateView(LoginRequiredMixin, View):
+class AccountUserDeactivateView(GroupRequiredMixin, LoginRequiredMixin, View):
+    group_names = [settings.ACCOUNT_ADMIN_GROUP, ]
     model = User
     
     def get(self, request, uuid):

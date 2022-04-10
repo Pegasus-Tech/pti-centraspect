@@ -1,6 +1,6 @@
 from django.test import Client, TestCase
 
-from .models import Account, Roles, User
+from .models import Account, User
 from centraspect import messages
 import json
 
@@ -11,18 +11,18 @@ class TestAuthenticationAPI(TestCase):
         client = Client()
         acct = Account.objects.create(name='Test Account')
         user1 = User.objects.create(first_name='Test', last_name='User', email='test@user.com',
-                                    username='test@user.com', account=acct, role=Roles.INSPECTOR)
+                                    username='test@user.com', account=acct)
         user1.set_password('abadone')
         user1.save()
 
         user2 = User.objects.create(first_name='Test2', last_name='User2', email='test2@user.com',
-                                    username='test2@user.com', account=acct, role=Roles.ACCOUNT_ADMIN)
+                                    username='test2@user.com', account=acct)
         user2.set_password('abadone')
         user2.save()
 
         acct2 = Account.objects.create(name='Test Account 2')
         user3 = User.objects.create(first_name='Test3', last_name='User3', email='test3@user.com',
-                                    username='test3@user.com', account=acct2, role=Roles.ACCOUNT_ADMIN)
+                                    username='test3@user.com', account=acct2)
         user3.set_password('abadone')
         user3.save()
 
