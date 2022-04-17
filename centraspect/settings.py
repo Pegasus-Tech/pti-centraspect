@@ -48,7 +48,7 @@ ADMIN_USER_PW = 'nitsuj3106D!'
 AUTH_TOKEN_EXPIRY = os.environ.get('AUTH_TOKEN_EXPIRY') or 60 * 60
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('CENTRA_DEBUG_ON') or True
+DEBUG = False
 DEBUG_PROPAGATE_EXCEPTIONS = True
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
@@ -179,7 +179,15 @@ Q_CLUSTER = {
     'save_limit': 250,
     'queue_limit': 500,
     'cpu_affinity': 1,
-    'redis': os.environ.get('REDIS_URL') or 'redis://127.0.0.1:6379'
+    'redis': {
+        'host': os.environ.get('REDIS_HOST') or 'localhost',
+        'port': os.environ.get('REDIS_PORT') or '6379',
+        'db': 0,
+        'ssl_ca_certs': None,
+        'ssl_cert_reqs': None
+        # os.environ.get('REDIS_URL') or 'redis://127.0.0.1:6379'
+    }
+
 }
 
 PASSWORD_HASHERS = [
