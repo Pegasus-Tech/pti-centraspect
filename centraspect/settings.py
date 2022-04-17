@@ -11,8 +11,9 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 import os
-from pathlib import Path
 import django_heroku
+from pathlib import Path
+from urllib.parse import urlparse
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,7 +38,7 @@ AWS_S3_ADDRESSING_STYLE = 'virtual'
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
 }
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage' 
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 MAX_IMAGE_SIZE = (500, 500)
@@ -67,7 +68,6 @@ INSPECTOR_GROUP = 'Inspector'
 USER_GROUP = 'User'
 VIEWER_GROUP = 'Viewer'
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -85,7 +85,7 @@ INSTALLED_APPS = [
     'fontawesomefree',
     'django_q',
     'django_htmx',
-    
+
     'authentication',
     'dashboard',
     'inspection_forms',
@@ -125,12 +125,12 @@ STATICFILES_DIRS = [
 ]
 
 WEBPACK_LOADER = {
-  'DEFAULT': {
-    'CACHE': not DEBUG,
-    'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
-    'POLL_INTERVAL': 0.1,
-    'IGNORE': [r'.+\.hot-update.js', r'.+\.map'],
-  }
+    'DEFAULT': {
+        'CACHE': not DEBUG,
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
+        'POLL_INTERVAL': 0.1,
+        'IGNORE': [r'.+\.hot-update.js', r'.+\.map'],
+    }
 }
 
 TEMPLATES = [
@@ -151,7 +151,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'centraspect.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
@@ -170,6 +169,8 @@ DATABASES = {
     }
 }
 
+url = urlparse(os.environ.get("REDIS_URL"))
+
 Q_CLUSTER = {
     'name': 'centraspect',
     'workers': 8,
@@ -180,9 +181,12 @@ Q_CLUSTER = {
     'queue_limit': 500,
     'cpu_affinity': 1,
     'redis': {
-        'host': os.environ.get('REDIS_HOST') or 'localhost',
-        'port': os.environ.get('REDIS_PORT') or '6379',
+        'host': url.hostname or 'localhost',
+        'port': url.port or '6379',
         'db': 0,
+        'username': url.username,
+        'password': url.password,
+        'ssl': True,
         'ssl_ca_certs': None,
         'ssl_cert_reqs': None
         # os.environ.get('REDIS_URL') or 'redis://127.0.0.1:6379'
@@ -197,7 +201,6 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.Argon2PasswordHasher',
     'django.contrib.auth.hashers.ScryptPasswordHasher',
 ]
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -217,7 +220,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
@@ -228,7 +230,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
