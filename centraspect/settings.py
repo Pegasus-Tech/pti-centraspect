@@ -48,7 +48,7 @@ ADMIN_USER_PW = 'nitsuj3106D!'
 AUTH_TOKEN_EXPIRY = os.environ.get('AUTH_TOKEN_EXPIRY') or 60 * 60
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 DEBUG_PROPAGATE_EXCEPTIONS = True
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
@@ -249,5 +249,9 @@ AUTH_USER_MODEL = 'authentication.User'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/login/'
+
+WHITENOISE_USE_FINDERS = True
+WHITENOISE_MANIFEST_STRICT = False
+WHITENOISE_ALLOW_ALL_ORIGINS = True
 
 django_heroku.settings(locals())
