@@ -40,7 +40,7 @@ export function loadFullCalendar(inspection_data) {
             center: 'title',
             end: 'today'
         },
-        themeSystem: 'bootstrap',
+        // themeSystem: 'bootstrap',
         events: data
       }
 
@@ -58,13 +58,6 @@ export function loadFullCalendar(inspection_data) {
         } else {
             return inspection.title
         }
-    }
-
-    function getCalendarVisibilityRange() {
-        let today = moment()
-        let two_years = today.add(2, 'y').format('yyyy-MM-DD')
-        console.log("Two Years Out ", two_years)
-        return two_years
     }
 
     function getEventColor(inspection) {

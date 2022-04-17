@@ -2,12 +2,15 @@ from django.contrib.auth.models import Group
 from django.shortcuts import redirect, render
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordResetForm
 from django.contrib import messages
 from django.views.generic import ListView, CreateView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django_q.tasks import async_task
+
 from authentication.forms import AdminCreateUserForm
 from authentication.mixins import GroupRequiredMixin
-from authentication.models import User, Account
+from authentication.models import User, Account, Subscription, SubscriptionType
 from centraspect import settings
 from inspection_items import service as equipment_service
 
@@ -21,14 +24,18 @@ def registration_view(request):
         return render(request, 'registration/register.html')
     
     if request.method == 'POST':
-        acct = Account.objects.create(name=request.POST.get('company_name'))
+        data = request.POST
+        sub = Subscription.objects.create(type=SubscriptionType.TRIAL)
+        acct = Account.objects.create(name=data.get('company_name'),
+                                      account_type=data.get('account_type'),
+                                      subscription=sub)
         user = User.objects.create(
             account=acct,
-            username=request.POST.get('email'),
-            email=request.POST.get('email'),
-            first_name=request.POST.get('first_name'),
-            last_name=request.POST.get('last_name'))
-        user.set_password(request.POST.get('password'))
+            username=data.get('email'),
+            email=data.get('email'),
+            first_name=data.get('first_name'),
+            last_name=data.get('last_name'))
+        user.set_password(data.get('password'))
         user.save()
 
         group = Group.objects.filter(name='Account Admin')
@@ -43,7 +50,7 @@ def registration_view(request):
         
         if authed_user is not None:
             login(request=request, user=authed_user)
-            return render(request=request, template_name='dashboard/index.html')
+            return redirect('dashboard')
            
 
 def login_view(request):
@@ -77,6 +84,25 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
+
+
+def forgot_password_view(request):
+    if request.method == 'GET':
+        return render(request, 'registration/password_reset_form.html', context={"form": PasswordResetForm})
+
+    if request.method == 'POST':
+        email = request.POST['email']
+        if email is not None and email != '':
+            user = User.objects.filter(email=email)
+            if user.exists():
+                async_task('task_worker.email_service.send_user_forgot_password_email', user.get())
+                return render(request, 'registration/password_reset_done.html', context={"user_email": user.get().email})
+            else:
+                messages.error(request, f'No user with email {email} found. Please verify the entered email and try again.')
+                return render(request, 'registration/password_reset_form.html', context={"form": PasswordResetForm})
+        else:
+            messages.error(request, f'Enter a valid email to send the instructions to.')
+            return render(request, 'registration/password_reset_form.html', context={"form": PasswordResetForm})
 
 
 @login_required
@@ -160,6 +186,7 @@ class AccountCreateUserView(GroupRequiredMixin, LoginRequiredMixin, CreateView):
                 user.groups.add(group)
                 user.save()
                 messages.success(request, f"Success! {user.get_full_name} was created.")
+                async_task('task_worker.email_service.send_user_added_email', user, request.user.account)
             except Exception as e:
                 print(f'Error Creating User :: {e}')
                 if 'duplicate' in str(e):

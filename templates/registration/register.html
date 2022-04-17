@@ -12,22 +12,38 @@
 
                             <legend class="uk-legend">Register</legend>
 
-                            <div class="uk-margin">
-                                <input class="uk-input" name='company_name' type="text" placeholder="Company Name">
-                            </div>
-                            <div class="uk-grid">
+                            <div uk-grid>
                                 <div class="uk-width-1-2">
+                                    <label>Company Name</label>
+                                    <input class="uk-input" name='company_name' type="text" placeholder="Company Name">
+                                </div>
+                                <div class="uk-width-1-2">
+                                    <label>Account Type</label>
+                                    <select name="account_type" class="uk-select">
+                                        <option value="">Select One</option>
+                                        <option value="vendor">Vendor</option>
+                                        <option value="customer">Inspector Only</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div uk-grid class="uk-margin-small-top">
+                                <div class="uk-width-1-2">
+                                    <label>First Name</label>
                                     <input class="uk-input" name='first_name' type="text" placeholder="First Name">
                                 </div>
                                 <div class="uk-width-1-2">
+                                    <label>Last Name</label>
                                     <input class="uk-input" name='last_name' type="text" placeholder="Last Name">
                                 </div>
                             </div>
 
                             <div class="uk-margin">
+                                <label>Email</label>
                                 <input class="uk-input" name='email' type="email" placeholder="Email">
                             </div>
                             <div class="uk-margin">
+                                <label>Password</label>
                                 <input class="uk-input" name='password' type="password" placeholder="Password">
                             </div>
                             <button class="uk-button uk-button-primary uk-width-1-1 uk-margin-small-bottom" type="submit">Register</button>

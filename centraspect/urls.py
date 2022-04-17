@@ -16,7 +16,8 @@ Including another URLconf
 from django.conf.urls import include
 from django.contrib import admin
 from django.urls import path, re_path
-from authentication.views import registration_view, login_view, logout_view
+from authentication.views import registration_view, login_view, logout_view, forgot_password_view
+from django.contrib.auth.views import PasswordResetView, PasswordResetConfirmView, PasswordResetCompleteView
 from authentication.api_view import get_auth_token
 from dashboard.views import DashboardView
 from .views import LandingPage
@@ -35,10 +36,13 @@ from rest_framework import permissions
 
 urlpatterns = [
     path('', LandingPage.as_view(), name="landing_page"),
-    path('admin/', admin.site.urls),
+    path('centra/admin/', admin.site.urls),
     path('register/', registration_view, name='signup'),
     path('login/', login_view, name='login'),
     path('logout/', logout_view, name='logout'),
+    path('forgot_password/', forgot_password_view, name='forgot_password'),
+    path('reset/<uidb64>/<token>', PasswordResetConfirmView.as_view(), name='reset_password_confirm'),
+    path('reset/done', PasswordResetCompleteView.as_view(), name='password_reset_complete'),
     path('api/auth/', include('authentication.urls', namespace='api_auth')),
     
     path('dashboard/', DashboardView.as_view(), name='dashboard'),

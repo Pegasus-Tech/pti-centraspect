@@ -13,6 +13,21 @@ from centraspect.models import BaseModel
 from centraspect.settings import AUTH_TOKEN_EXPIRY
 
 
+class SubscriptionType(models.TextChoices):
+    VENDOR = 'vendor', _('Vendor')
+    CUSTOMER = 'customer', _('Customer')
+    ENTERPRISE = 'enterprise', _('Enterprise')
+    TRIAL = 'trial', _('Trial')
+
+
+class Subscription(models.Model):
+    type = models.TextField(max_length=200, choices=SubscriptionType.choices, null=False)
+    is_cancelled = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    start_date = models.DateField(auto_now_add=True)
+    last_updated = models.DateField(auto_now=True)
+
+
 class Address(models.Model):
     city = models.CharField(max_length=255, unique=False, blank=False, null=False)
     state = models.CharField(max_length=2, blank=False, null=True)
@@ -21,10 +36,19 @@ class Address(models.Model):
     street_two = models.CharField(max_length=1024, blank=True, null=True)
 
 
+class AccountTypes(models.TextChoices):
+    VENDOR = 'vendor', _('Vendor')
+    CUSTOMER = 'customer', _('Customer')
+
+
 class Account(BaseModel):
     name = models.CharField(max_length=255, unique=False, blank=False, null=False)
     address = models.OneToOneField(Address, on_delete=models.CASCADE, primary_key=False, null=True)
     is_active = models.BooleanField(default=True)
+    account_type = models.TextField(max_length=200, default=AccountTypes.CUSTOMER, choices=AccountTypes.choices,
+                                    null=False, blank=False)
+    subscription = models.OneToOneField(Subscription, on_delete=models.CASCADE,
+                                        null=True, primary_key=False)
 
     def __str__(self) -> str:
         return f'[name: {self.name}, uuid: {self.uuid}, is_active: {self.is_active}]'

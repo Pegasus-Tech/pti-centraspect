@@ -20,7 +20,12 @@
             <img src="static/images/centraspect_logo_trans.png" alt="" width="200">
         </div>
                 <div class="uk-overlay uk-position-top-right uk-light">
-                   <a href="{% url 'login' %}" class="uk-link-reset">Login</a>
+                    <span class="uk-margin-small-right" style="border-right: 1px solid white; padding-right: 10px;">
+                        <a href="{% url 'signup' %}" class="uk-link-reset">Register</a>
+                    </span>
+                    <span>
+                        <a href="{% url 'login' %}" class="uk-link-reset">Login</a>
+                    </span>
                 </div>
         <div class="uk-overlay uk-position-center uk-text-center uk-light">
             <h1 class="uk-text-bolder uk-visible@s">The New Way<br/>To Perform Inspections</h1>

@@ -150,7 +150,7 @@ class InspectionSubItemCreateView(GroupRequiredMixin, LoginRequiredMixin, View):
         try:
             form_id = data['form'] if data['form'] != '' else None
             assigned_to_id = data['assigned_to'] if data['assigned_to'] != '' else None
-            expiration_date = data['expiration_date'] if data['expiration_date'] else None
+            expiration_date = datetime.strptime(data['expiration_date'], '%Y-%m-%d') if data['expiration_date'] else None
             item = InspectionItem.objects.create(title=data['title'],
                                                  is_kit=True,
                                                  account=request.user.account,
@@ -161,8 +161,9 @@ class InspectionSubItemCreateView(GroupRequiredMixin, LoginRequiredMixin, View):
                                                  inspection_interval=data['inspection_interval'],
                                                  assigned_to_id=assigned_to_id,
                                                  form_id=form_id,
-                                                 next_inspection_date=datetime.strptime(data['next_inspection_date'], '%Y-%m-%d'),
-                                                 expiration_date=datetime.strptime(expiration_date, '%Y-%m-%d'))
+                                                 next_inspection_date=datetime.strptime(data['next_inspection_date'],
+                                                                                        '%Y-%m-%d'),
+                                                 expiration_date=expiration_date)
 
             print(f'created it {item}')
             sub_items = data['subItems']

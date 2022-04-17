@@ -48,13 +48,19 @@ ADMIN_USER_PW = 'nitsuj3106D!'
 AUTH_TOKEN_EXPIRY = os.environ.get('AUTH_TOKEN_EXPIRY') or 60 * 60
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('CENTRA_DEBUG_ON') or True
 DEBUG_PROPAGATE_EXCEPTIONS = True
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # SESSION_COOKIE_AGE = 60*60*4 # expire after 4 hours
 
 ALLOWED_HOSTS = ['*']
+APP_HOST_URL = os.environ.get('CENTRA_HOST_URL') or 'http://localhost:8000'
+
+CENTRASPECT_FROM_EMAIL = os.environ.get('CENTRA_FROM_EMAIL') or 'justin@pegasustechinnovations.com'
+EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
+SENDGRID_API_KEY = os.environ["SENDGRID_API_KEY"]
+SENDGRID_SANDBOX_MODE_IN_DEBUG = False
 
 ACCOUNT_ADMIN_GROUP = 'Account Admin'
 INSPECTOR_GROUP = 'Inspector'
@@ -233,5 +239,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'authentication.User'
 LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/dashboard/'
+LOGOUT_REDIRECT_URL = '/login/'
 
 django_heroku.settings(locals())
