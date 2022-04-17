@@ -48,7 +48,7 @@ ADMIN_USER_PW = 'nitsuj3106D!'
 AUTH_TOKEN_EXPIRY = os.environ.get('AUTH_TOKEN_EXPIRY') or 60 * 60
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 DEBUG_PROPAGATE_EXCEPTIONS = True
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
