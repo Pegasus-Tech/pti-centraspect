@@ -1,5 +1,4 @@
 import os
-import django_heroku
 from urllib.parse import urlparse
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -65,5 +64,3 @@ Q_CLUSTER = {
 WHITENOISE_USE_FINDERS = True
 WHITENOISE_MANIFEST_STRICT = False
 WHITENOISE_ALLOW_ALL_ORIGINS = True
-
-django_heroku.settings(locals())

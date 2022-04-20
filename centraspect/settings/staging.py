@@ -1,5 +1,4 @@
 import os
-import django_heroku
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -50,5 +49,3 @@ Q_CLUSTER = {
     'cpu_affinity': 1,
     'redis': os.environ.get('REDIS_URL') or 'redis://127.0.0.1:6379'
 }
-
-django_heroku.settings(locals())

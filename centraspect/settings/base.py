@@ -1,4 +1,5 @@
 import os
+import django_heroku
 from pathlib import Path
 
 
@@ -173,3 +174,5 @@ AUTH_USER_MODEL = 'authentication.User'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/login/'
+
+django_heroku.settings(locals())
