@@ -34,3 +34,18 @@ def send_user_forgot_password_email(to_user):
         "reset_password_link": url
     }
     msg.send(fail_silently=False)
+
+
+def send_support_request_email(form_data):
+    print('Sending support request email')
+    msg = EmailMessage(
+        from_email=settings.CENTRASPECT_FROM_EMAIL,
+        to=['justin@pegasustechinnovations.com', 'dom@pegasustechinnovations.com'],
+    )
+    msg.template_id = "d-22591bf287554d96ab279445d544914e"
+    msg.dynamic_template_data = {
+        'sender': form_data['full_name'],
+        'sender_email': form_data['email'],
+        'body': form_data['support_ticket_body']
+    }
+    msg.send(fail_silently=False)

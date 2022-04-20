@@ -20,7 +20,7 @@ from authentication.views import registration_view, login_view, logout_view, for
 from django.contrib.auth.views import PasswordResetView, PasswordResetConfirmView, PasswordResetCompleteView
 from authentication.api_view import get_auth_token
 from dashboard.views import DashboardView
-from .views import LandingPage
+from .views import LandingPage, PrivacyPolicyView, TermsAndConditionsView, SupportView
 from rest_framework import permissions
 # from drf_yasg.views import get_schema_view
 # from drf_yasg import openapi
@@ -36,6 +36,9 @@ from rest_framework import permissions
 
 urlpatterns = [
     path('', LandingPage.as_view(), name="landing_page"),
+    path('privacy-policy/', PrivacyPolicyView.as_view(), name='privacy_policy'),
+    path('terms-and-conditions/', TermsAndConditionsView.as_view(), name='terms_and_conditions'),
+    path('support/', SupportView.as_view(), name='support'),
     path('centra/admin/', admin.site.urls),
     path('register/', registration_view, name='signup'),
     path('login/', login_view, name='login'),

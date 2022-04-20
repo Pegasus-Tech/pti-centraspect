@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -9,6 +10,9 @@
     <link href='https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.1/css/all.css' rel='stylesheet'>
     <link href='https://stackpath.bootstrapcdn.com/bootswatch/4.3.1/cosmo/bootstrap.min.css' rel="stylesheet">
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
 </head>
 <body>
 
@@ -83,15 +87,17 @@
     <div class="uk-container" >
         <div uk-grid>
             <div class="uk-width-1-2">
-                <h1>Simple, Yet Effective Metrics</h1>
-                <p class="uk-text-meta uk-text-default">Track your inspection compliance rates with easy to use and simple metrics.
-                No more bloated charts and data tables that are hard to read. Get simple, and concise
-                metrics that tell you exactly what you need to know.</p>
+                <h1>Equipment Management Made Easy</h1>
+                <p class="uk-text-meta uk-text-default">From single pieces of equipment to complex kits, <strong>Centraspect</strong>
+                has you covered. Build and manage your equipment in an easy-to-navigate web interface that provides simple insights to
+                    your equipment, inspection logs, next due dates and compliance rates.
+                </p>
                 <a href="{% url 'signup' %}" class="uk-button uk-button-primary uk-button uk-border-pill" style="background-color: #1E87F0; color:white">Get Started</a>
             </div>
 
             <div class="uk-width-1-2">
-                <img src="https://www.lapa.ninja/lab/atlas/img/feature-1.png" alt="">
+{#                <img src="https://www.lapa.ninja/lab/atlas/img/feature-1.png" alt="">#}
+                <img src="{% static 'images/Centraspect Laptop.png' %}" alt="">
             </div>
         </div>
 
@@ -102,7 +108,8 @@
     <div class="uk-container" >
         <div uk-grid>
             <div class="uk-width-1-2" uk-scrollspy="cls: uk-animation-fade; target: img; delay: 500; repeat: true">
-                <img src="https://preview.colorlib.com/theme/appy/images/xheader-mobile.png.pagespeed.ic.TC6bxBlXPg.webp" width="300" alt="">
+{#                <img src="https://preview.colorlib.com/theme/appy/images/xheader-mobile.png.pagespeed.ic.TC6bxBlXPg.webp" width="300" alt="">#}
+                <img src="{% static 'images/Centraspect Smartphone.png' %}" width="300" alt="">
             </div>
             <div class="uk-width-1-2">
                 <h1 style="color: white">Mobile Inspections That Make Sense</h1>
@@ -121,6 +128,7 @@
     </div>
 </div>
 
+{% include 'shared/primary_footer.html' %}
 
 
 <script src="https://cdn.jsdelivr.net/npm/uikit@3.9.4/dist/js/uikit.min.js"></script>
@@ -130,5 +138,6 @@
 <script src="https://formbuilder.online/assets/js/form-builder.min.js"></script>
 <script src="https://formbuilder.online/assets/js/form-render.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
