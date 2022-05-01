@@ -1,6 +1,6 @@
 from django.db import models
 from centraspect.models import BaseModel
-from centraspect.utils import S3UploadType, S3UploadUtils
+from centraspect.utils.S3Utils import S3UploadType, S3UploadUtils
 from inspection_forms.models import InspectionForm
 from inspection_items.models import InspectionItem
 from authentication.models import Account, User
@@ -53,7 +53,7 @@ class InspectionManager(models.Manager):
     def get_all_for_item(self, item, *args, **kwargs):
         if item is not None:
             qs = self.get_queryset().all()
-            qs = qs.filter(item=item)
+            qs = qs.filter(item=item, is_deleted=False)
             return qs
         else:
             return self.get_queryset().none()

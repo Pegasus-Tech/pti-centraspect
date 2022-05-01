@@ -2,6 +2,7 @@ __pycache__/
 .idea/
 node_modules/
 *.log
+static/.DS_Store
 local_settings.py
 db.sqlite3
 db.sqlite3-journal

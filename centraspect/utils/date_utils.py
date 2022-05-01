@@ -1,130 +1,8 @@
-import datetime
-import random
-import string
-import qrcode
 
-from enum import Enum
-from io import BytesIO
 from calendar import monthrange
 from dateutil.relativedelta import relativedelta
 from datetime import date, timedelta
-
-from django.core.files import File
-from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
-from django.utils.text import slugify
-from PIL import Image
-
-from centraspect.settings import MAX_IMAGE_SIZE
-
-
-class S3UploadType(Enum):
-    QR_CODE = 'qr_codes'
-    INSPECTION_IMAGE = 'inspections'
-
-
-class S3UploadUtils:
-
-    @staticmethod
-    def build_upload_to_path(account, uuid, upload_type):
-        path = ''
-        base_path = f'{slugify(account.name)}-{account.uuid}/'
-
-        if upload_type == S3UploadType.QR_CODE:
-            path = f'{base_path}{upload_type.value}'
-
-        elif upload_type == S3UploadType.INSPECTION_IMAGE:
-            path = f"{base_path}{upload_type.value}/inspection-{uuid}"
-
-        else:
-            raise ValueError(f"Invalid S3UploadType ({upload_type}) provided.")
-
-        return path
-
-    @staticmethod
-    def generate_qr_code_image(account, instance_uuid, serialized_data):
-        qr = qrcode.QRCode(version=1, box_size=10, border=5)
-
-        qr.add_data(serialized_data)
-        qr.make(fit=True)
-
-        img = qr.make_image(fill='black', back_color='white')
-
-        image = BytesIO()
-        img.save(image)
-
-        file_buffer = S3UploadUtils.upload_image(account=account,
-                                                 instance_uuid=instance_uuid,
-                                                 upload_type=S3UploadType.QR_CODE,
-                                                 image=image)
-
-        return file_buffer
-
-    @staticmethod
-    def build_bucket_path(account, instance_uuid, upload_type, **kwargs):
-        path = ''
-        base_path = f'{slugify(account.name)}-{account.uuid}/'
-        if upload_type == S3UploadType.QR_CODE:
-            path = f'{base_path}{upload_type.value}/item-{instance_uuid}.png'
-
-        elif upload_type == S3UploadType.INSPECTION_IMAGE:
-            path = f"{base_path}{upload_type.value}/inspection-{instance_uuid}/{kwargs.pop('filename')}"
-
-        else:
-            raise ValueError(f"Invalid S3UploadType ({upload_type}) provided.")
-
-        return path
-
-    @staticmethod
-    def upload_image(account, instance_uuid, upload_type, image):
-
-        if upload_type == S3UploadType.QR_CODE:
-            filename = S3UploadUtils.build_bucket_path(account, instance_uuid, upload_type)
-            file_buffer = InMemoryUploadedFile(image, None, filename, 'image/png', image.getbuffer().nbytes, None)
-
-            if S3UploadUtils.__validate_file_type(file_buffer):
-                return file_buffer
-
-        elif upload_type == S3UploadType.INSPECTION_IMAGE:
-            temp_path = image.temporary_file_path()
-
-            if S3UploadUtils.__validate_file_type(image):
-                # open the image with Pillow
-                img = Image.open(temp_path, mode='r')
-                img.thumbnail(size=MAX_IMAGE_SIZE)
-
-                # Create a bytes buffer and save the image into the buffer
-                img_buffer = BytesIO()
-                img.save(img_buffer, format='PNG', quality=25, optimize=True)
-
-                # create a Django friendly file
-                the_image = File(img_buffer, name=f'{S3UploadUtils.generate_filename()}.png')
-                return the_image
-
-        else:
-            raise ValueError(f"Invalid S3UploadType ({upload_type}) provided.")
-
-    @staticmethod
-    def generate_filename():
-        return ''.join(random.choices(string.ascii_lowercase + string.ascii_uppercase + string.digits, k=21))
-
-    @staticmethod
-    def __validate_file_type(file):
-        extension = S3UploadUtils.__get_file_extension(file)
-
-        if extension.lower() != 'png' and extension.lower() != 'jpg' and extension.lower() != 'jpeg':
-            raise TypeError(f"Invalid image type provided '.{extension}'. Accepted images types are .png, .jpg/.jpeg")
-
-        else:
-            return True
-
-    @staticmethod
-    def __get_file_extension(file):
-        if isinstance(file, InMemoryUploadedFile):
-            return file.name.split('.')[-1]
-        elif isinstance(file, TemporaryUploadedFile):
-            return file.temporary_file_path().split('.')[-1]
-        else:
-            raise TypeError(f"Unknown file type: '{type(file)}")
+from inspections.service import get_last_due_date_for_item, get_last_inspection_by_due_date
 
 
 class DateUtils:
@@ -148,8 +26,27 @@ class DateUtils:
         return rtn
 
     @staticmethod
-    def __get_bi_weekly_block():
-        pass
+    def __get_bi_weekly_block(item):
+        last_due_inspection = get_last_due_date_for_item(item=item).first()
+        print(f'last_due_inspection :: {last_due_inspection}')
+        if last_due_inspection is not None:
+            print(f'got inspection :: {last_due_inspection}')
+            start_date = last_due_inspection.due_date
+            end_date = (start_date + timedelta(weeks=2)) - timedelta(days=1)
+            rtn = (start_date, end_date)
+            return rtn
+        else:
+            last_due = get_last_inspection_by_due_date(item).first()
+
+            if last_due is None:
+                # if no due date exists, then just return today + 2 weeks
+                rtn = (date.today(), (date.today() + timedelta(weeks=2)) - timedelta(days=1))
+                return rtn
+
+            start_date = last_due.due_date
+            end_date = (last_due.due_date + timedelta(weeks=2)) - timedelta(days=1)
+            rtn = (start_date, end_date)
+            return rtn
 
     @staticmethod
     def __get_monthly_block():
@@ -260,12 +157,18 @@ class DateUtils:
             return 0
 
     @staticmethod
-    def get_inspection_time_block(interval):
+    def get_inspection_time_block(item):
+        interval = item.inspection_interval
+
         if interval == 'daily':
             return (date.today(), date.today())
 
         elif interval == 'weekly':
             return DateUtils.__get_weekly_block()
+
+        elif interval == 'bi-weekly':
+            print('bi-weekly block')
+            return DateUtils.__get_bi_weekly_block(item)
 
         elif interval == 'monthly':
             return DateUtils.__get_monthly_block()

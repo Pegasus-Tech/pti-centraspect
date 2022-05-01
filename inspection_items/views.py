@@ -112,7 +112,11 @@ class InspectionItemUpdateView(GroupRequiredMixin, LoginRequiredMixin, UpdateVie
         form = InspectionItemForm(self.request.user.account, self.request.POST or None, instance=inspection_item)
 
         if form.is_valid:
-            form.save()
+            if inspection_item.inspection_interval != request.POST.get('inspection_interval'):
+                form.save()
+                async_task('task_worker.service.update_inspection_intervals', inspection_item)
+            else:
+                form.save()
             return redirect(reverse("inspection_items:details", kwargs={"uuid": uuid}))
         else:
             return render(request=self.request, template_name='400.html', context={"error_msg": "error saving form"})

@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from .serializers import InspectionFormSerializer
 from authentication.models import User
 from centraspect.messages import NO_FORM_ATTACHED_ERROR, INVALID_INSPECTION_ITEM_UUID
-from centraspect.utils import S3UploadType, S3UploadUtils
+from centraspect.utils.S3Utils import S3UploadType, S3UploadUtils
 from inspection_forms.models import InspectionForm
 from inspection_items import service as inspection_item_service
 from inspection_items.models import InspectionItem

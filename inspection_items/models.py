@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
 from authentication.models import User, Account
 from centraspect.models import BaseModel
-from centraspect.utils import S3UploadType, S3UploadUtils
+from centraspect.utils.S3Utils import S3UploadType, S3UploadUtils
 from inspection_forms.models import InspectionForm
 from datetime import date
 from .utils import serialize_inspection_item, serialize_inspection_sub_item
@@ -54,6 +54,7 @@ class InspectionItemManager(models.Manager):
 class InspectionInterval(models.TextChoices):
     DAILY = 'daily', _('Daily')
     WEEKLY = 'weekly', _('Weekly')
+    BI_WEEKLY = 'bi-weekly', _('Bi-Weekly')
     MONTHLY = 'monthly', _('Monthly')
     QUARTERLY = 'quarterly', _('Quarterly')
     SEMI_ANNUALLY = 'semi-annually', _('Semi-Annually')

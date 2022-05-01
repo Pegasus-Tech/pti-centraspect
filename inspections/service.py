@@ -1,3 +1,5 @@
+import datetime
+
 from .models import Inspection
 
 
@@ -20,3 +22,15 @@ def update_missed_inspection_for_item(item, prior_to_date):
         count += 1
 
     return count
+
+
+def get_last_due_date_for_item(item):
+    qs = Inspection.objects.get_all_for_item(item=item)
+    qs = qs.filter(completed_date__isnull=False).order_by('-completed_date')
+    return qs
+
+
+def get_last_inspection_by_due_date(item):
+    qs = Inspection.objects.get_all_for_item(item=item)
+    qs = qs.filter(due_date__lte=datetime.date.today()).order_by('-due_date')
+    return qs

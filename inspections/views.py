@@ -37,7 +37,7 @@ class LogNewInspectionView(LoginRequiredMixin, LogInspectionMixin, View):
             resp = {'url': f'/dashboard/inspection-items/{item.uuid}'}
             return JsonResponse(resp)
         else:
-            print(f"FAILURE :: {inspection.get('inspection')}")
+            print(f"FAILURE :: {inspection.get('error')}")
             context['item'] = item
             context['form_json'] = json.dumps(item.form.form_json)
             resp = {'url': f'/dashboard/inspections/new/{item.uuid}'}

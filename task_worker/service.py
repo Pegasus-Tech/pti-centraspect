@@ -1,7 +1,7 @@
 from django.db.models import Q
 
 from inspection_items.models import InspectionItem
-from centraspect.utils import DateUtils
+from centraspect.utils.date_utils import DateUtils
 from inspections.models import Inspection
 
 from datetime import date, timedelta
@@ -39,6 +39,42 @@ def delete_unlogged_inspections(item: InspectionItem):
     for inspection in qs:
         inspection.is_deleted = True
         inspection.save()
+
+
+def update_inspection_intervals(item):
+    """
+    TODO:
+        if the inspection interval gets changed,
+        we need to calc the future due dates
+        from the last due date/completed date
+        (could be completed if the inspection was completed past due or
+        another inspection was added to the list)
+    """
+    print(f"Updating Intervals to :: {item}")
+    items = Inspection.objects.get_all_for_item(item=item)
+
+    if items.exists():
+        last_due_inspection = items.filter(due_date__lte=date.today()).order_by('-due_date').first()
+        if last_due_inspection is not None:
+            # recalc all dates from the last_due_date
+            next_due_date = last_due_inspection.due_date
+            to_update = items.filter(due_date__gte=next_due_date).order_by('due_date')
+            for insp in to_update:
+                insp.due_date = next_due_date
+                insp.save()
+                next_due_date = DateUtils.increase_date_by_interval(next_due_date, item.inspection_interval)
+
+        else:
+            # get all dates and recalc them all
+            ordered_inspections = items.order_by('due_date')
+            next_due_date = ordered_inspections.first().due_date
+
+            for insp in ordered_inspections:
+                insp.due_date = next_due_date
+                insp.save()
+                next_due_date = DateUtils.increase_date_by_interval(next_due_date, item.inspection_interval)
+    else:
+        build_future_inspections(item=item)
 
 
 def cache_inspection_updates(inspection):

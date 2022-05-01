@@ -2,7 +2,7 @@ from .models import Inspection
 from datetime import date, timedelta
 
 from centraspect import messages
-from centraspect.utils import DateUtils
+from centraspect.utils.date_utils import DateUtils
 from inspections import service as inspection_service
 
 
@@ -29,7 +29,7 @@ class LogInspectionMixin:
 
         try:
             # Find the interval block the inspection is in
-            interval_block = DateUtils.get_inspection_time_block(item.inspection_interval)
+            interval_block = DateUtils.get_inspection_time_block(item)
 
             # Mark missed inspections as missed
             inspection_service.update_missed_inspection_for_item(item=item, prior_to_date=interval_block[0])
