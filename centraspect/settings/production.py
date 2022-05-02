@@ -7,8 +7,7 @@ DEBUG_PROPAGATE_EXCEPTIONS = True
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
-ALLOWED_HOSTS = ['https://www.centraspect.io', 'https://centraspect.io',
-                 'https://centraspect-production.herokuapp.com/', 'https://www.centraspect-production.herokuapp.com/']
+ALLOWED_HOSTS = ['*']
 APP_HOST_URL = 'https://www.centraspect.io'
 
 CENTRASPECT_FROM_EMAIL = os.environ.get('CENTRA_FROM_EMAIL')
