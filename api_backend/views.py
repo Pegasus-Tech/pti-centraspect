@@ -58,12 +58,15 @@ class FormItemAPIView(LogInspectionMixin, APIView):
         print(f'looking for form :: {uuid}')
         items = InspectionItem.objects.filter(uuid=uuid)
 
+        # TODO: check if the requesting user has access and return 401 if not authorized
+
         if not items.exists():
             return JsonResponse(status=404, data={"error_message": INVALID_INSPECTION_ITEM_UUID})
 
         item = items[0]
 
         serialized = {
+            "is_failed": item.failed_inspection,
             "inspection_item_title": item.title,
             "inspection_item_uuid": item.uuid,
             "inspection_item_owner": item.assigned_to.get_full_name if item.assigned_to is not None else None,
@@ -81,7 +84,7 @@ class FormItemAPIView(LogInspectionMixin, APIView):
         disposition = None
         filled_form = data.get('inspection_form_filled') or None
 
-        # TODO - update User to be the authed user from the mobile app
+        # TODO - get the user from the auth token and apply to form. Return 401 if the user doesn't have access
         user = User.objects.filter(account__user__is_superuser=True).first()
         try:
             disposition = data['disposition']
