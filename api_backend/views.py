@@ -2,9 +2,9 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 
+from authentication.mixins import TokenRequiredMixin
 from .serializers import InspectionFormSerializer
-from authentication.models import User
-from centraspect.messages import NO_FORM_ATTACHED_ERROR, INVALID_INSPECTION_ITEM_UUID
+from centraspect.messages import NO_FORM_ATTACHED_ERROR, INVALID_INSPECTION_ITEM_UUID, ACCESS_DENIED_ERROR
 from centraspect.utils.S3Utils import S3UploadType, S3UploadUtils
 from inspection_forms.models import InspectionForm
 from inspection_items import service as inspection_item_service
@@ -52,18 +52,22 @@ def attach_photos_to_inspection(request, uuid):
         return JsonResponse(status=400, data={"Error", f"Inspection {uuid} not found."})
 
 
-class FormItemAPIView(LogInspectionMixin, APIView):
+class FormItemAPIView(TokenRequiredMixin, LogInspectionMixin, APIView):
 
-    def get(self, request, uuid):
+    def get(self, request, uuid, *args, **kwargs):
         print(f'looking for form :: {uuid}')
+        authed_user = kwargs.get('authed_user')
         items = InspectionItem.objects.filter(uuid=uuid)
-
-        # TODO: check if the requesting user has access and return 401 if not authorized
 
         if not items.exists():
             return JsonResponse(status=404, data={"error_message": INVALID_INSPECTION_ITEM_UUID})
 
-        item = items[0]
+        item = items.get()
+
+        # TODO: Update mixin to do this check at some point...
+        # if the accounts don't match, you aint gettin in
+        if not authed_user.account == item.account:
+            return JsonResponse(status=401, data={"error_message": ACCESS_DENIED_ERROR})
 
         serialized = {
             "is_failed": item.failed_inspection,
@@ -77,28 +81,38 @@ class FormItemAPIView(LogInspectionMixin, APIView):
         }
         return JsonResponse(status=200, data=serialized)
 
-    def post(self, request, uuid):
+    def post(self, request, uuid, *args, **kwargs):
         print(f"Getting reqeust :: {self.request.data} for form uuid {uuid}")
+        authed_user = kwargs.get('authed_user')
         data = self.request.data
-        item = InspectionItem.objects.get(uuid=uuid)
         disposition = None
         filled_form = data.get('inspection_form_filled') or None
 
-        # TODO - get the user from the auth token and apply to form. Return 401 if the user doesn't have access
-        user = User.objects.filter(account__user__is_superuser=True).first()
+        print(f"SUBMITTED FORM (in post()) :: {filled_form}")
+
+        items = InspectionItem.objects.filter(uuid=uuid)
+
+        if not items.exists():
+            return JsonResponse(status=404, data={"error_message": INVALID_INSPECTION_ITEM_UUID})
+
+        item = items.get()
+
+        # if the accounts don't match, you aint gettin in
+        if not authed_user.account == item.account:
+            return JsonResponse(status=401, data={"error_message": ACCESS_DENIED_ERROR})
+
         try:
             disposition = data['disposition']
         except KeyError:
             print(f'No disposition attached to request')
             return JsonResponse(data={"error_message": "No disposition attached to request"}, status=400)
         finally:
-
             if filled_form is None or filled_form == '':
                 resp = {"error_message": NO_FORM_ATTACHED_ERROR}
                 return JsonResponse(status=400, data=resp)
 
             inspection = self.log_inspection(inspection_item=item,
-                                             logged_by=user,
+                                             logged_by=authed_user,
                                              completed_form=data['inspection_form_filled'],
                                              inspection_disposition=disposition or 'pass')
             if inspection.get('success'):

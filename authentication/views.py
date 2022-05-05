@@ -31,8 +31,8 @@ def registration_view(request):
                                       subscription=sub)
         user = User.objects.create(
             account=acct,
-            username=data.get('email'),
-            email=data.get('email'),
+            username=data.get('email').lower(),
+            email=data.get('email').lower(),
             first_name=data.get('first_name'),
             last_name=data.get('last_name'))
         user.set_password(data.get('password'))
@@ -61,7 +61,7 @@ def login_view(request):
         return render(request, 'registration/login.html')
     
     if request.method == 'POST':
-        username = request.POST.get('username')
+        username = request.POST.get('username').lower()
         password = request.POST.get('password')
         user = authenticate(request=request, username=username, password=password)
         

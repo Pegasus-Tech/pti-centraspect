@@ -16,10 +16,13 @@ def get_auth_token(request):
         creds = json.loads(request.body)
 
         try:
-            user = authenticate(username=creds['email'], password=creds['password'])
+            user = authenticate(username=creds['email'].lower(), password=creds['password'])
             print(f'User :: {user}')
             if user is not None:
                 token = Token.objects.get_or_create(user=user)[0]
+                new_token = Token.generate_auth_token()  # generate a new token on every login, so we know it is fresh
+                token.auth_token = new_token
+                token.save()
                 return JsonResponse(status=200,  data=token.to_json)
             else:
                 return JsonResponse(status=400, data={"Credential Error": messages.INVALID_USER_CREDENTIAL_ERROR})

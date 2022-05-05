@@ -48,6 +48,7 @@ class LogInspectionMixin:
                 inspection.completed_by = user
                 inspection.completed_past_due = self.get_is_past_due(inspection.due_date)
                 inspection.failed_inspection = self.is_failed_inspection(disposition)
+                inspection.json = json_form
                 inspection.save()
 
             else:
