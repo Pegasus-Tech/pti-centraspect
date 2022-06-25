@@ -49,12 +49,14 @@ urlpatterns = [
     path('api/auth/', include('authentication.urls', namespace='api_auth')),
     
     path('dashboard/', DashboardView.as_view(), name='dashboard'),
-    path('dashboard/users/', include('authentication.urls', namespace="users")),
     path('dashboard/inspection-items/', include('inspection_items.urls', namespace="inspection_items")),
     path('dashboard/inspection-calendar', include('inspection_calendar.urls', namespace="inspection_calendar")),
-    path('dashboard/form-builder', include('inspection_forms.urls', namespace="inspection_forms")),
-    path('dashboard/inspections', include('inspections.urls', namespace='inspections')),
-    
+    path('dashboard/form-builder/', include('inspection_forms.urls', namespace="inspection_forms")),
+    path('dashboard/inspections/', include('inspections.urls', namespace='inspections')),
+
+    path('dashboard/admin/users/', include('authentication.urls', namespace="users")),
+    path('dashboard/admin/sites/', include('sites.urls', namespace="sites")),
+
     # path('api/docs', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('api/', include('api_backend.urls', namespace='api'))
 ]

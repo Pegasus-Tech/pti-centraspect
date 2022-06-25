@@ -35,14 +35,15 @@ INSTALLED_APPS = [
     'django_q',
     'django_htmx',
 
+    'api_backend',
     'authentication',
     'dashboard',
+    'inspection_calendar',
     'inspection_forms',
     'inspection_items',
-    'inspection_calendar',
     'inspections',
     'qr_codes',
-    'api_backend',
+    'sites',
     'task_worker'
 ]
 

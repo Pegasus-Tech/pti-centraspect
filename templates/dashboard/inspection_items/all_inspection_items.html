@@ -198,7 +198,7 @@
             {% for item in inspectionitem_list %}
                 <tr>
                     <td class="uk-text-bolder">
-                        <a class="uk-link-text" href="{{ item.get_absolute_url }}">{{ item.title|capfirst }}</a>
+                        <div uk-tooltip="title:{{ item.title|capfirst }}; delay:1000"><a class="uk-link-text" href="{{ item.get_absolute_url }}">{{ item.title|capfirst|truncatewords:5 }}</a></div>
                     </td>
 
                     {% if item.inspection_type == 'rescue' %}

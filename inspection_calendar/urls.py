@@ -3,5 +3,5 @@ from .views import InspectionCalendarView
 
 app_name = 'inspection_calendar'
 urlpatterns = [
-    path('/calendar', InspectionCalendarView.as_view(), name="calendar")
+    path('calendar', InspectionCalendarView.as_view(), name="calendar")
 ]

@@ -9,6 +9,18 @@ from centraspect.views import return_invalid_token_response, return_token_expire
 
 
 class GroupRequiredMixin:
+    """
+    A mixin to verify a user making the request has a certain group associated with them.
+
+    When using this mixin, ensure the mixin is first in the extension list and provide a
+    @variable group_names that is equal to a list strings that represent the group names
+    that have access to this request class
+
+    Example:
+        class MyTestView(GroupRequiredMixin, LoginRequiredMixin, ...):
+            group_names = ['ADMIN_GROUP', 'GENERIC_USER_GROUP', ...]
+            ...
+    """
     group_names = None
 
     def dispatch(self, request, *args, **kwargs):
