@@ -85,8 +85,9 @@ class TokenManager(models.Manager):
             raise InvalidTokenError("Invalid token provided")
 
         now = datetime.datetime.now(tz=None)
-        print(f"Is Expired? {(now.timestamp() - token.updated_at.timestamp()) > AUTH_TOKEN_EXPIRY}")
-        return (now.timestamp() - token.updated_at.timestamp()) > AUTH_TOKEN_EXPIRY
+        expiry = float(AUTH_TOKEN_EXPIRY)
+        print(f"Is Expired? {(now.timestamp() - token.updated_at.timestamp()) > expiry}")
+        return (now.timestamp() - token.updated_at.timestamp()) > expiry
 
 
 class Token(models.Model):
@@ -123,7 +124,8 @@ class Token(models.Model):
     @classmethod
     def is_auth_token_expired(cls, updated_at):
         now = datetime.datetime.now()
-        return (now - updated_at) > AUTH_TOKEN_EXPIRY
+        expiry = float(AUTH_TOKEN_EXPIRY)
+        return (now - updated_at) > expiry
 
     @property
     def to_json(self):
@@ -131,7 +133,7 @@ class Token(models.Model):
         return {
             "account_uuid": self.user.account.uuid,
             "auth_token": self.auth_token,
-            "expires": AUTH_TOKEN_EXPIRY,
+            "expires": float(AUTH_TOKEN_EXPIRY),
             "refresh_token": self.refresh_token,
             "ROLES": roles
         }
